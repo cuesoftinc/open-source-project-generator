@@ -1,6 +1,6 @@
 # Development Dockerfile for Open Source Template Generator
 
-FROM golang:1.24-alpine
+FROM golang:1.25-alpine
 
 # Install development dependencies
 RUN apk add --no-cache \
