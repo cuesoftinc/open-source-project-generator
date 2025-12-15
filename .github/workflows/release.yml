@@ -173,7 +173,7 @@ jobs:
 
       - name: Upload Windows artifacts
         if: matrix.os == 'windows'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: generator-${{ matrix.os }}-${{ matrix.arch }}
           path: dist/generator-${{ matrix.os }}-${{ matrix.arch }}.zip
@@ -187,7 +187,7 @@ jobs:
 
       - name: Upload non-Windows artifacts
         if: matrix.os != 'windows'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: generator-${{ matrix.os }}-${{ matrix.arch }}
           path: dist/generator-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
@@ -236,7 +236,7 @@ jobs:
         run: make package
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: packages
           path: packages/
