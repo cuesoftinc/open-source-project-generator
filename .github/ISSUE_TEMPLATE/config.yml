@@ -1,23 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Discussions & Questions
-    url: https://github.com/cuesoftinc/open-source-project-generator/discussions
-    about: Ask questions, share ideas, and get help from the community.
-  - name: Documentation
-    url: https://github.com/cuesoftinc/open-source-project-generator/tree/main/docs
-    about: Check our documentation for detailed guides and references.
-  - name: Getting Started
-    url: https://github.com/cuesoftinc/open-source-project-generator/blob/main/docs/GETTING_STARTED.md
-    about: Quick start guide to begin using the project generator.
-  - name: Troubleshooting Guide
-    url: https://github.com/cuesoftinc/open-source-project-generator/blob/main/docs/TROUBLESHOOTING.md
-    about: Common issues and solutions to help resolve problems quickly.
-  - name: Template Development Guide
-    url: https://github.com/cuesoftinc/open-source-project-generator/blob/main/docs/TEMPLATE_DEVELOPMENT.md
-    about: Learn how to create and customize templates.
-  - name: Configuration Guide
-    url: https://github.com/cuesoftinc/open-source-project-generator/blob/main/docs/CONFIGURATION.md
-    about: Learn how to configure the project generator for your needs.
-  - name: Security Issues
-    url: https://github.com/cuesoftinc/open-source-project-generator/security/advisories/new
-    about: Report security vulnerabilities privately. See SECURITY.md for details.
+  - name: Security vulnerability
+    url: https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability
+    about: Please report security issues privately via the Security tab, not as public issues.
