@@ -15,7 +15,7 @@ func CreateProjectStructure(projectPath string, folders []string) error {
 
 	for _, folder := range folders {
 		folderPath := filepath.Join(projectPath, folder)
-		if err := os.MkdirAll(folderPath, 0755); err != nil {
+		if err := os.MkdirAll(folderPath, 0750); err != nil {
 			return fmt.Errorf("failed to create folder %s: %w", folder, err)
 		}
 	}

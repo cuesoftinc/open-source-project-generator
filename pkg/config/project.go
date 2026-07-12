@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/cuesoftinc/open-source-project-generator/pkg/constants"
 	"github.com/cuesoftinc/open-source-project-generator/pkg/mapper"
@@ -34,7 +36,14 @@ type Project struct {
 }
 
 func LoadProject(path string) (*Project, error) {
-	data, err := os.ReadFile(path)
+	// Clean the user-supplied path and reject any attempt to traverse to a
+	// parent directory before opening the file (mitigates path inclusion).
+	cleanPath := filepath.Clean(path)
+	if cleanPath == ".." || strings.HasPrefix(cleanPath, ".."+string(os.PathSeparator)) {
+		return nil, fmt.Errorf("invalid config file path %q: must not reference a parent directory", path)
+	}
+
+	data, err := os.ReadFile(cleanPath) // #nosec G304 -- path is cleaned and validated above to prevent directory traversal
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
@@ -42,6 +51,10 @@ func LoadProject(path string) (*Project, error) {
 	var cfg ProjectConfig
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	}
+
+	if err := validateProjectName(cfg.ProjectName); err != nil {
+		return nil, err
 	}
 
 	project := &Project{
@@ -89,4 +102,24 @@ func LoadProject(path string) (*Project, error) {
 	}
 
 	return project, nil
+}
+
+// validateProjectName ensures the configured project name is safe to use as a
+// filesystem path segment and as an argument to external commands. It rejects
+// empty names, parent-directory references, absolute paths, and embedded path
+// separators.
+func validateProjectName(name string) error {
+	if name == "" {
+		return fmt.Errorf("project_name must not be empty")
+	}
+	if strings.Contains(name, "..") {
+		return fmt.Errorf("project_name %q must not contain '..'", name)
+	}
+	if filepath.IsAbs(name) {
+		return fmt.Errorf("project_name %q must not be an absolute path", name)
+	}
+	if strings.ContainsAny(name, `/\`) {
+		return fmt.Errorf("project_name %q must not contain path separators", name)
+	}
+	return nil
 }
