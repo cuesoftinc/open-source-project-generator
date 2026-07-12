@@ -5,9 +5,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 
 	"github.com/cuesoftinc/open-source-project-generator/pkg/output"
 )
+
+// validAppName restricts generated app names to lowercase letters, digits, and
+// hyphens. This matches npm package naming rules and prevents command injection
+// via untrusted values passed to the "npx" subprocess.
+var validAppName = regexp.MustCompile(`^[a-z0-9-]+$`)
 
 type FrontendGenerator struct {
 	Version    string
@@ -21,7 +27,11 @@ func (g *FrontendGenerator) Generate(projectName string) error {
 
 	for _, app := range g.Apps {
 		appName := projectName + "-" + app
+		if !validAppName.MatchString(appName) {
+			return fmt.Errorf("invalid app name %q: must match %s", appName, `^[a-z0-9-]+$`)
+		}
 
+		// #nosec G204 -- appName is validated against ^[a-z0-9-]+$ above; the command and all remaining arguments are static literals
 		cmd := exec.Command("npx", fmt.Sprintf("create-next-app@%s", g.Version), appName,
 			"--typescript",
 			"--tailwind",
