@@ -10,11 +10,10 @@ description: >-
 # CueLABS Project Standard
 
 This skill encodes how CueLABS repositories are structured so a coding agent can
-**bootstrap a new repo** or **standardize an existing one** consistently. It
-replaces a former Go scaffolding CLI: scaffolding is just
-directory creation, file templates, and standard tool invocations
-(`create-next-app`, `go mod init`, …), all of which an agent does directly — and
-an agent can also refactor an existing repo, which the CLI never could.
+**bootstrap a new repo** or **standardize an existing one** consistently.
+Scaffolding is just directory creation, file templates, and standard tool
+invocations (`create-next-app`, `go mod init`, …), all of which an agent does
+directly — and an agent can also refactor an existing repo in place.
 
 The reference implementation is **cuesoftinc/apparule** — when in doubt, mirror it.
 
