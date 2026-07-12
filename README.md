@@ -14,8 +14,10 @@ replaced by:
 
 - **[`SKILL.md`](SKILL.md)** — the standard and the procedures (bootstrap a new
   repo; standardize an existing one), for a coding agent to follow.
-- **[`templates/`](templates/)** — reusable file templates (community-health
-  files, `.dockerignore`, `.editorconfig`, `dependabot.yml`, issue/PR templates).
+- **[`templates/`](templates/)** — reusable file templates: community-health
+  files, a scoped `dependabot.example.yml`, and issue/PR templates. Dotfile
+  templates are stored without the leading dot (copy `dockerignore.root` →
+  `.dockerignore`, `editorconfig` → `.editorconfig`).
 
 The reference implementation of the standard is **cuesoftinc/apparule**.
 
@@ -33,7 +35,11 @@ cleanup rules.
 ```
 SKILL.md        The standard + bootstrap/standardize procedures
 templates/      Reusable file templates
+.github/        Issue and pull-request templates for this repo
 ```
+
+Plus the usual community-health files: `LICENSE`, `CONTRIBUTING.md`,
+`CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`.
 
 ## License
 
