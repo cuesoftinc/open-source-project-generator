@@ -1,5 +1,5 @@
 ---
-name: cuelabs-project-standard
+name: cuelabs-engineering-standards
 description: >-
   The CueLABS repository standard for coding agents. Use when bootstrapping a
   new CueLABS repo or standardizing an existing one (apparule, expendit, upstat,
@@ -7,7 +7,7 @@ description: >-
   conventions, OSS community-health files, deploy layout, and cleanup rules.
 ---
 
-# CueLABS Project Standard
+# CueLABS Engineering Standards
 
 This skill encodes how CueLABS repositories are structured so a coding agent can
 **bootstrap a new repo** or **standardize an existing one** consistently.
