@@ -5,8 +5,7 @@ coding agents** rather than a CLI.
 
 ## What this is
 
-This repository used to be a Go CLI (`open-source-project-generator`) that
-scaffolded new projects. Scaffolding, though, is just directory creation, file
+This repository used to be a Go scaffolding CLI that generated new projects. Scaffolding, though, is just directory creation, file
 templates, and standard tool invocations (`create-next-app`, `go mod init`, …) —
 all of which a coding agent does directly, and an agent can additionally
 *standardize an existing repo*, which the CLI could not. So the CLI has been
