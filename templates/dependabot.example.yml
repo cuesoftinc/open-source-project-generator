@@ -1,0 +1,30 @@
+# Copy to .github/dependabot.yml and keep ONE entry per real manifest directory.
+# Never point at dead/deprecated directories (e.g. web/.deprecated).
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /api/common
+    schedule: { interval: weekly }
+    groups:
+      go-dependencies: { patterns: ["*"] }
+
+  # One entry per additional (function-named) service that has a manifest:
+  - package-ecosystem: pip
+    directory: /api/<python-service>   # e.g. /api/measure, /api/observability
+    schedule: { interval: weekly }
+    groups:
+      python-dependencies: { patterns: ["*"] }
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule: { interval: weekly }
+    groups:
+      npm-dependencies: { patterns: ["*"] }
+
+  - package-ecosystem: pub
+    directory: /mobile/flutter
+    schedule: { interval: weekly }
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
