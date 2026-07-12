@@ -49,7 +49,11 @@ service exists — do not add empty `api/image` placeholders.
 
 ## Community health & config (required root files)
 
-Mirror these from apparule (templates in [`templates/`](templates/)):
+Adapt these from the apparule reference. Some ship as ready-to-copy templates in
+[`templates/`](templates/) (see the note below the table); the repo-specific
+ones — `README.md`, `CONTRIBUTING.md`, `CODEOWNERS`, `CHANGELOG.md`, `LICENSE`,
+`.gitignore`, `Makefile` — have no generic template and are written per repo,
+mirroring apparule's.
 
 | File | Purpose |
 |------|---------|
@@ -67,6 +71,14 @@ Mirror these from apparule (templates in [`templates/`](templates/)):
 | `.github/dependabot.yml` | **Scoped per manifest**, grouped per ecosystem |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.github/ISSUE_TEMPLATE/` | bug_report, feature_request, config.yml |
+
+**What's in `templates/`:** ready-to-copy `CODE_OF_CONDUCT.md`, `SECURITY.md`,
+`PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/*`, and a scoped
+`dependabot.example.yml`. Dotfile templates are stored **without** a leading dot
+so they stay visible and are never applied by accident — when adopting them,
+copy `templates/dockerignore.root` → `.dockerignore` and `templates/editorconfig`
+→ `.editorconfig`. `templates/ISSUE_TEMPLATE/config.yml` contains a `<repo>`
+placeholder to replace.
 
 `dependabot.yml` must list one `updates` entry per real manifest directory
 (`gomod /api/common`, `pip /api/<python-service>`, `npm /web`,
