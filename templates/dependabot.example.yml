@@ -1,5 +1,7 @@
 # Copy to .github/dependabot.yml and keep ONE entry per real manifest directory.
 # Never point at dead/deprecated directories (e.g. web/.deprecated).
+# NOTE: no `github-actions` entry — this standard uses no CI workflows, so a
+# github-actions updater would fail with "no workflows found".
 version: 2
 updates:
   - package-ecosystem: gomod
@@ -21,10 +23,7 @@ updates:
     groups:
       npm-dependencies: { patterns: ["*"] }
 
+  # Only if the repo has a Flutter app with a pubspec.yaml:
   - package-ecosystem: pub
     directory: /mobile/flutter
-    schedule: { interval: weekly }
-
-  - package-ecosystem: github-actions
-    directory: /
     schedule: { interval: weekly }
