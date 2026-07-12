@@ -1,5 +1,5 @@
 ---
-name: cuelabs-engineering-standards
+name: oss-engineering-standards
 description: >-
   The CueLABS repository standard for coding agents. Use when bootstrapping a
   new CueLABS repo or standardizing an existing one (apparule, expendit, upstat,
