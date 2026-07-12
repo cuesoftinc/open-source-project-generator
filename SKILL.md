@@ -49,11 +49,11 @@ service exists — do not add empty `api/image` placeholders.
 
 ## Community health & config (required root files)
 
-Adapt these from the apparule reference. Some ship as ready-to-copy templates in
-[`templates/`](templates/) (see the note below the table); the repo-specific
-ones — `README.md`, `CONTRIBUTING.md`, `CODEOWNERS`, `CHANGELOG.md`, `LICENSE`,
-`.gitignore`, `Makefile` — have no generic template and are written per repo,
-mirroring apparule's.
+**These files must have parity across all CueLABS repos** — byte-identical,
+sourced from [`templates/`](templates/). Only `README.md`, `CHANGELOG.md`,
+`Makefile`, and `.github/dependabot.yml` are repo-specific (repo overview, its
+own history, its own build targets, and its own manifest scoping); everything
+else in the table below is identical across repos.
 
 | File | Purpose |
 |------|---------|
@@ -72,18 +72,20 @@ mirroring apparule's.
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.github/ISSUE_TEMPLATE/` | bug_report, feature_request, config.yml |
 
-**What's in `templates/`:** ready-to-copy `CODE_OF_CONDUCT.md`, `SECURITY.md`,
-`PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/*`, and a scoped
-`dependabot.example.yml`. Dotfile templates are stored **without** a leading dot
-so they stay visible and are never applied by accident — when adopting them,
-copy `templates/dockerignore.root` → `.dockerignore` and `templates/editorconfig`
-→ `.editorconfig`. `templates/ISSUE_TEMPLATE/config.yml` contains a `<repo>`
-placeholder to replace.
+**What's in `templates/`:** ready-to-copy `LICENSE`, `CODEOWNERS`,
+`CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `PULL_REQUEST_TEMPLATE.md`,
+`ISSUE_TEMPLATE/*`, and a `dependabot.example.yml`. Dotfile templates are stored
+**without** a leading dot so they stay visible and are never applied to this repo
+by accident — when adopting them, copy `templates/gitignore` → `.gitignore`,
+`templates/dockerignore.root` → `.dockerignore`, and `templates/editorconfig` →
+`.editorconfig`.
 
-`dependabot.yml` must list one `updates` entry per real manifest directory
-(`gomod /api/common`, `pip /api/<python-service>`, `npm /web`,
-`pub /mobile/flutter`, `github-actions /`) and **must not** point at dead or
-deprecated directories.
+`dependabot.yml` is the one config that is **not** identical across repos: it
+lists one `updates` entry per real manifest directory (`gomod /api/common`,
+`pip /api/<python-service>`, `npm /web`, `pub /mobile/flutter`), grouped per
+ecosystem, and **must not** point at dead/deprecated directories. It has **no**
+`github-actions` entry — this standard uses no CI workflows, so that updater
+would fail with "no workflows found".
 
 ## Deploy convention
 A single `deploy/helm` chart deploys **all** services — including the Envoy
