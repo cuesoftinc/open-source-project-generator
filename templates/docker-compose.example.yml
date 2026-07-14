@@ -1,0 +1,29 @@
+# Example local stack. Copy to repo root as docker-compose.yml and adapt
+# services to the repo. `make up` runs `docker compose up --build -d`.
+services:
+  api-common:
+    build: ./api/common
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+    restart: unless-stopped
+
+  # Add one block per additional service that exists, e.g. api/<service>:
+  # api-<service>:
+  #   build: ./api/<service>
+  #   ...
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-http://localhost:8080}
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+    depends_on:
+      api-common:
+        condition: service_healthy
+    restart: unless-stopped
