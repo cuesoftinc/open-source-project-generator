@@ -164,6 +164,14 @@ liveness+readiness probes (`healthPath`/`readyPath`, tcp fallback),
 `.Files.Get` in a ConfigMap. Always `helm lint` + `helm template` before
 shipping.
 
+Chart gotchas that cost real time:
+- Pods run `runAsNonRoot` with a **numeric** `runAsUser` (default 10001;
+  web images run as `node` = 1000, Envoy as 101) — kubelet cannot verify
+  named users and rejects the pod otherwise.
+- **Bump `Chart.yaml` version on every chart change** — the terraform helm
+  provider does not upgrade local charts whose version is unchanged.
+- Images live under the `cuesoft` Docker Hub org: `cuesoft/<repo>-<service>`.
+
 `deploy/terraform` (see `templates/terraform/`) is **cluster-agnostic**: the
 helm provider authenticates via kubeconfig (`kubeconfig_path`/`kube_context`
 variables) and installs the repo chart — no cloud-specific providers.
