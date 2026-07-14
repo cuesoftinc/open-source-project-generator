@@ -1,0 +1,9 @@
+# Copy to Chart.yaml and set name/description per repo. Bump `version` on every
+# chart change — the terraform helm provider will not upgrade a local chart
+# whose version is unchanged.
+apiVersion: v2
+name: REPO
+description: Deploys all services for REPO to Kubernetes.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
