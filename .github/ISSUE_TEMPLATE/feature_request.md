@@ -14,6 +14,6 @@ Describe the change you'd like.
 ## Alternatives considered
 
 ## Affected area
-`api/common` / `api/<service>` / `web` / `mobile` / `deploy` / other
+`SKILL.md` / `templates/` / other
 
 ## Additional context

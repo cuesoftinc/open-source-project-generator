@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
-
+- `templates/Dockerfile.python`, per-context `templates/dockerignore.{go,web,python}`,
+  `templates/env.example`, standard-form Helm chart skeleton (`templates/helm/`),
+  and cluster-agnostic terraform (`templates/terraform/`).
 - Port convention (`api/common`=8080, `web`=3000, additional APIs increment from
   8081) and a per-language file & folder naming standard in `SKILL.md`.
 - `SKILL.md`: the CueLABS repository standard plus bootstrap and standardize
@@ -24,3 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Refined the production service-structure guidance (singular Go packages,
   FastAPI `lifespan`, web `src/` + route conventions) and synced the `Makefile`,
   `Dockerfile.go`, `Dockerfile.web`, and `docker-compose.example.yml` templates.
+
+### Changed
+- SKILL.md: per-service internals standard (README/.gitignore/.dockerignore/
+  .env.example per service), canonical Go module paths, SSR-safety and
+  127.0.0.1-healthcheck gotchas, envoy-in-compose pattern, standard-form
+  Helm/terraform deploy convention, scoped `.dockerignore` parity claim, and
+  several accuracy fixes (docs/ list, data stores, root-layout wording).
+- PR template: dropped the CI reference (the standard has no CI workflows).
+

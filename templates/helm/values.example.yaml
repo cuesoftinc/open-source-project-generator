@@ -1,0 +1,22 @@
+# Example values for the standard-form chart (copy per repo as values.yaml).
+# Image org on Docker Hub is `cuesoft` — images are cuesoft/<repo>-<service>.
+replicaCount: 1
+
+services:
+  api-common:
+    image: cuesoft/REPO-api-common:latest
+    port: 8080
+    healthPath: /health
+    readyPath: /ready
+    # h2c: true            # gRPC + HTTP multiplexed on one port
+    # runAsUser: 10001     # numeric UID (default 10001; web images use 1000, envoy 101)
+    env:
+      PORT: "8080"
+
+  web:
+    image: cuesoft/REPO-web:latest
+    port: 3000
+    runAsUser: 1000
+    healthPath: /
+    env:
+      PORT: "3000"
