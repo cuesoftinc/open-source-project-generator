@@ -3,6 +3,7 @@
 services:
   api-common:
     build: ./api/common
+    image: cuesoft/REPO-api-common:latest
     ports:
       - "8080:8080"
     environment:
@@ -15,6 +16,7 @@ services:
   #   ...
 
   web:
+    image: cuesoft/REPO-web:latest
     build:
       context: ./web
       args:
