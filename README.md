@@ -31,7 +31,7 @@ cleanup rules.
 ```
 SKILL.md        The standard + bootstrap/standardize procedures
 templates/      Reusable file templates
-.github/        Issue and pull-request templates for this repo
+.github/        Issue templates and Dependabot config for this repo
 ```
 
 Plus the usual community-health files: `LICENSE`, `CONTRIBUTING.md`,

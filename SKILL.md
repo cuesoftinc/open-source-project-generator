@@ -31,10 +31,10 @@ mobile/
   android/           Native Android (Kotlin) — placeholder until built
   ios/               Native iOS (Swift) — placeholder until built
 deploy/
-  docker/            Container / compose configuration
-  helm/              ONE chart that deploys ALL services (incl. Envoy) to k8s
-  terraform/         Infrastructure as code
-docs/                overview.md, setup.md, api/, ui/
+  docker/            Extra container assets (compose itself lives at the repo root)
+  helm/              ONE standard-form chart that deploys ALL services (incl. Envoy) to k8s
+  terraform/         Cluster-agnostic IaC: installs the Helm chart via kubeconfig
+docs/                overview.md, setup.md (+ optional api/, architecture.md)
 scripts/             Developer / CI helper scripts
 ```
 
@@ -64,17 +64,20 @@ compose-driven `Makefile` — is identical across repos.
 | `CHANGELOG.md` | Keep a Changelog format |
 | `LICENSE` | Project license |
 | `.gitignore` | Must NOT ignore `.dockerignore`; must ignore `.env*`, secrets |
-| `.dockerignore` | Root + one per build context; exclude `.env`/secrets/artifacts |
+| `.dockerignore` | Root byte-identical; plus one per build context (repo-specific, see `templates/dockerignore.*`) |
 | `.editorconfig` | Shared editor settings (tabs for Go) |
 | `Makefile` | Compose-driven standard targets (up/down/build/logs/…); identical across repos |
+| `.env.example` | Root env template: per-service sections, dev-safe defaults, `NEXT_PUBLIC_*` block |
 | `.github/dependabot.yml` | **Scoped per manifest**, grouped per ecosystem |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.github/ISSUE_TEMPLATE/` | bug_report, feature_request, config.yml |
 
 **What's in `templates/`:** ready-to-copy `LICENSE`, `CODEOWNERS`,
 `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `PULL_REQUEST_TEMPLATE.md`,
-`ISSUE_TEMPLATE/*`, `Makefile`, a `dependabot.example.yml`, and Docker templates
-(`Dockerfile.go`, `Dockerfile.web`, `docker-compose.example.yml`). Dotfile templates are stored
+`ISSUE_TEMPLATE/*`, `Makefile`, a `dependabot.example.yml`, an `env.example`,
+Docker templates (`Dockerfile.go`, `Dockerfile.web`, `Dockerfile.python`,
+`docker-compose.example.yml`, per-context `dockerignore.*`), the standard-form
+Helm chart skeleton (`helm/`), and cluster-agnostic terraform (`terraform/`). Dotfile templates are stored
 **without** a leading dot so they stay visible and are never applied to this repo
 by accident — when adopting them, copy `templates/gitignore` → `.gitignore`,
 `templates/dockerignore.root` → `.dockerignore`, and `templates/editorconfig` →
@@ -90,6 +93,12 @@ would fail with "no workflows found".
 ## Service structure (production)
 When bootstrapping or standardizing a service, **migrate existing code into
 these layouts** — don't scaffold empty projects.
+
+**Every service directory** (each `api/*`, `web`) carries its own internals,
+consistent across repos: `README.md` (layout/run/config/test), `.gitignore`,
+`.dockerignore` (see `templates/dockerignore.*`), and `.env.example` with the
+service's native-run variables (compose users rely on the root `.env`).
+Go module paths are canonical: `github.com/cuesoftinc/<repo>/api/common`.
 
 **Go (`api/common`):**
 ```
@@ -117,7 +126,8 @@ non-root image, pinned deps.
 src/app/                      routes — home at `/`, product dashboard at `/dashboard`
 src/{components,lib,hooks,types,config,context}   src/proto/ (generated grpc-web, verbatim)
 ```
-Minimal root `layout.tsx` (html/body + styled-components registry); the home page
+Minimal root `layout.tsx` (html/body — plus a CSS-in-JS registry only where the
+repo uses one); the home page
 renders its own shell; `/dashboard` gets a nested `layout.tsx`. `@/*` → `./src/*`,
 `output: "standalone"`.
 
@@ -146,6 +156,18 @@ A single `deploy/helm` chart deploys **all** services — including the Envoy
 gRPC-Web proxy where used — into a Kubernetes cluster. Do **not** create a
 standalone `deploy/envoy/`; Envoy config lives inside the Helm chart.
 
+The chart is standard-form (see `templates/helm/`): split
+`deployment.yaml`/`service.yaml` ranging over a `services:` values map,
+`_helpers.tpl` with the k8s recommended labels (name/instance/part-of/chart),
+liveness+readiness probes (`healthPath`/`readyPath`, tcp fallback),
+`runAsNonRoot`, `resources`, and `NOTES.txt`. Envoy's config is embedded via
+`.Files.Get` in a ConfigMap. Always `helm lint` + `helm template` before
+shipping.
+
+`deploy/terraform` (see `templates/terraform/`) is **cluster-agnostic**: the
+helm provider authenticates via kubeconfig (`kubeconfig_path`/`kube_context`
+variables) and installs the repo chart — no cloud-specific providers.
+
 ## Local development (Docker)
 Each repo has a root `docker-compose.yml` and a compose-driven `Makefile`
 (`make up` / `make down` / `make logs` / `make build`). Copy `.env.example` →
@@ -156,6 +178,13 @@ Each repo has a root `docker-compose.yml` and a compose-driven `Makefile`
   honors `$PORT` (default 8080), `/health` HEALTHCHECK.
 - **Next.js web** — `output: "standalone"` + multi-stage build that runs
   `node server.js` as the non-root `node` user (never `npm run dev` in an image).
+- **Python services** — `templates/Dockerfile.python`: `python:3.12-slim`,
+  non-root uid 10001, PORT-aware 127.0.0.1 `/health` healthcheck with a long
+  start period (model loads), `uvicorn app.main:app`.
+- **gRPC-Web repos** — run Envoy in compose (image pinned, config mounted from
+  `deploy/helm/envoy/envoy.yaml`, backend network-aliased to the cluster
+  target); Envoy takes the next port slot (e.g. upstat :8082) and the web image
+  gets `NEXT_PUBLIC_ENVOY_URL` as a build arg.
 
 **Port convention (parity across repos):** so muscle memory carries between
 services, every repo publishes the same host ports — `api/common` → **8080**,
@@ -171,6 +200,12 @@ Gotchas that cost real time:
   TypeScript 7 native compiler. Dependabot npm-group PRs can silently bump
   `typescript`/`eslint`/`@types/node` to breaking majors — pin them.
 - `NEXT_PUBLIC_*` are inlined at build time → pass them as Docker build args.
+- **SSR safety**: never touch `localStorage`/`window` during render — only in
+  `useEffect`/handlers (or behind `typeof window !== "undefined"`); prerender
+  crashes otherwise. Session state that both client and shell components need
+  belongs in cookies, written and read by the same names.
+- All healthchecks (web and APIs) target `127.0.0.1`, never `localhost`
+  (IPv6 resolution causes false-unhealthy containers).
 
 ## Cleanup rules (when standardizing)
 Remove (safe — not application code):
@@ -219,7 +254,7 @@ web + dashboard (Next.js) ─┐             api/common (Go)  ── GCP Cloud R
                            ├─ Firebase /  api/<svc> (Python/…) ── Cloud Run
 flutter mobile ────────────┘  Google auth
                                          data: Firebase Firestore & Storage,
-                                               Aiven Postgres & Valkey (Redis)
+                                               Firebase (apparule), MongoDB (+ Redis) elsewhere
 ```
 - Auth: Firebase Authentication / Google sign-in.
 - Backends deploy to GCP Cloud Run (and/or the Helm chart for k8s).
@@ -234,7 +269,7 @@ Keep current; last reviewed with the values below.
 | Go | 1.25+ — builder image matches the module's `go` directive (`golang:1.25-alpine`; apparule is on 1.26) |
 | Gin | v1.12 |
 | Node | 24 (`node:24-slim` images) |
-| Android (Kotlin / Gradle / compileSdk) | 2.2 / 9.1 / 36 |
+| Android (Kotlin / Gradle / compileSdk) | 2.2 / 9.1 / 36 — for future native apps |
 | Python | 3.12 (`python:3.12-slim` images) |
 
 Pin exact versions in each service's manifest; let Dependabot (scoped, grouped)
