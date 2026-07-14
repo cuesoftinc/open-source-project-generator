@@ -15,6 +15,8 @@ WORKDIR /app
 COPY --from=builder /app/app .
 USER appuser
 # Honor $PORT (Cloud Run); the app should default to 8080 locally.
+# EXPOSE is metadata only — when adapting this template for an additional API
+# (8081, 8082, … per the port convention), set EXPOSE to that service's port.
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- "http://localhost:${PORT:-8080}/health" || exit 1
