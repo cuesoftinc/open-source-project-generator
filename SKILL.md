@@ -231,11 +231,11 @@ Keep current; last reviewed with the values below.
 | Area | Version |
 |------|---------|
 | Next.js / React / TypeScript | 16.x / 19.2 / 5.9 |
-| Go | 1.25+ (`1.25-alpine` image) |
-| Gin | v1.11 |
-| Node | 20+ |
+| Go | 1.25+ — builder image matches the module's `go` directive (`golang:1.25-alpine`; apparule is on 1.26) |
+| Gin | v1.12 |
+| Node | 24 (`node:24-slim` images) |
 | Android (Kotlin / Gradle / compileSdk) | 2.2 / 9.1 / 36 |
-| Python | 3.11+ |
+| Python | 3.12 (`python:3.12-slim` images) |
 
 Pin exact versions in each service's manifest; let Dependabot (scoped, grouped)
 propose upgrades.
