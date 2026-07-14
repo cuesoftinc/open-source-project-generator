@@ -2,10 +2,11 @@
 # ---- build ----
 FROM golang:1.26-alpine AS builder
 WORKDIR /app
-COPY go.mod go.sum* ./
+COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -o app .
+# Entrypoint per the standard layout (cmd/server/main.go).
+RUN CGO_ENABLED=0 go build -o app ./cmd/server
 
 # ---- runtime ----
 FROM alpine:latest
