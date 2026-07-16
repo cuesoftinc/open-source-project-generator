@@ -256,13 +256,14 @@ Never remove:
 6. Wire `deploy/helm` to deploy every service.
 
 ## Architecture conventions
-```
-client                                   server
-web + dashboard (Next.js) ─┐             api/common (Go)  ── GCP Cloud Run
-                           ├─ Firebase /  api/<svc> (Python/…) ── Cloud Run
-flutter mobile ────────────┘  Google auth
-                                         data: Firebase Firestore & Storage,
-                                               Firebase (apparule), MongoDB (+ Redis) elsewhere
+```mermaid
+flowchart LR
+    WEB[web + dashboard<br/>Next.js — App Hosting] --> FB[Firebase / Google auth]
+    MOB[flutter mobile] --> FB
+    WEB --> AC[api/common — Go<br/>Cloud Run]
+    MOB --> AC
+    AC --> SVC["api/&lt;svc&gt; — Python/…<br/>Cloud Run"]
+    AC --> DATA[("per product: Firestore (apparule)<br/>or Aiven Postgres · + shared Aiven Redis<br/>· Cloud Storage")]
 ```
 - Auth: Firebase Authentication, **Google sign-in ONLY** — no username/password
   signup or login anywhere in the ecosystem. Enforce at three layers:
