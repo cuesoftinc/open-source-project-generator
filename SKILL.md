@@ -273,6 +273,9 @@ flutter mobile ────────────┘  Google auth
 - Backends deploy to GCP Cloud Run (provisioned via the `cuesoft-iac` Pulumi
   ecosystem — never ad-hoc); frontends deploy to Firebase App Hosting; the
   Helm chart remains the self-host path.
+- AI features use **Vertex AI** (Gemini via `aiplatform.googleapis.com`, ADC —
+  see `cuesoft-iac/functions/cueprise-gemini-proxy`); no consumer AI-vendor
+  API keys in cloud deployments. Self-host fallback: BYO Gemini/Groq env keys.
 - gRPC services front a gRPC-Web Envoy proxy (deployed via the Helm chart).
 
 ## Recommended versions
