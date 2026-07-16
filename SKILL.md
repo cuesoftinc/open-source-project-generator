@@ -350,6 +350,22 @@ deep-dive sections slot between the fixed ones):
 - Auth: Firebase ID-token bearer (Google-only); machine identities
   (service tokens, property keys) never grant user-API access.
 
+## Telemetry standard (OpenTelemetry, X-9)
+
+Every service instruments with **OTel SDKs**: traces (auto-instrumentation
+for HTTP/gRPC/DB clients + manual spans on domain operations), custom
+metrics (Meter API: counters/histograms per service KPIs), logs (slog/logging
+bridges). W3C `traceparent` propagates across all service boundaries.
+Export = **direct OTLP from the SDK** (BatchSpan/LogRecord processors);
+collector sidecar = later upgrade path, never a v1 requirement. **Receiver =
+upstat's OTLP gateway** (4317 gRPC / 4318 HTTP, ingest-key header) — CueLABS
+products dogfood upstat for their own observability. Export is env-gated:
+no OTEL_EXPORTER_OTLP_ENDPOINT → SDK no-ops (pre-OBS-001 posture). JSON
+stdout logging remains alongside (Cloud Run native). Operational telemetry
+≠ product analytics events (upstat /v1/events) — separate pipelines, never
+mixed. Env: OTEL_SERVICE_NAME, OTEL_EXPORTER_OTLP_ENDPOINT,
+OTEL_EXPORTER_OTLP_HEADERS, OTEL_RESOURCE_ATTRIBUTES.
+
 ## Environment-variable naming standard
 
 Identical names across all repos (Doppler `<project>/stg` is the source of
