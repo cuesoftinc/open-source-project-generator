@@ -264,8 +264,30 @@ flutter mobile ────────────┘  Google auth
                                          data: Firebase Firestore & Storage,
                                                Firebase (apparule), MongoDB (+ Redis) elsewhere
 ```
-- Auth: Firebase Authentication / Google sign-in.
-- Backends deploy to GCP Cloud Run (and/or the Helm chart for k8s).
+- Auth: Firebase Authentication, **Google sign-in ONLY** — no username/password
+  signup or login anywhere in the ecosystem. Enforce at three layers:
+  Email/Password provider disabled on the Firebase project; backends reject
+  tokens with `sign_in_provider != google.com`; UI ships exactly one
+  "Continue with Google" CTA. Sandbox identity project: `sandbox-e306a`;
+  `account.cuesoft.io` is a future facade over the same Firebase project.
+- Backends deploy to GCP Cloud Run (provisioned via the `cuesoft-iac` Pulumi
+  ecosystem — never ad-hoc); frontends deploy to Firebase App Hosting; the
+  Helm chart remains the self-host path.
+- AI features use **Vertex AI** (Gemini via `aiplatform.googleapis.com`, ADC —
+  see `cuesoft-iac/functions/cueprise-gemini-proxy`); no consumer AI-vendor
+  API keys in cloud deployments. Self-host fallback: BYO Gemini/Groq env keys.
+- Environments & deploy gating: `stg` = sandbox is the ONLY environment for
+  CueLABS products (no production); Doppler config `stg` holds its secrets.
+  **Open-source deviation from the cueprise flow**: merge-to-main never
+  deploys (build+test only); deploys fire **only on `v*` tag creation**,
+  gated by a tag ruleset (owner-level) + protected GitHub environment.
+- Data plane (cloud): per-product choice of **Aiven Postgres** or **Firestore**
+  (Firebase-native/real-time products → Firestore; financial/relational →
+  Postgres). Shared **Aiven Redis** with `REDIS_DB`-index tenancy per
+  product/config (irealty pattern: discrete `REDIS_*` vars). **Doppler** is
+  the env source of truth — project per repo, configs `dev / dev_personal /
+  stg / prd`. Object storage: the sandbox project's default **Cloud Storage** bucket
+  with per-product/env prefixes. Self-host compose bundles its own stores.
 - gRPC services front a gRPC-Web Envoy proxy (deployed via the Helm chart).
 
 ## Recommended versions
