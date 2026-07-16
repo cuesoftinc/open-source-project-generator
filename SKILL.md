@@ -290,6 +290,52 @@ flutter mobile ────────────┘  Google auth
   with per-product/env prefixes. Self-host compose bundles its own stores.
 - gRPC services front a gRPC-Web Envoy proxy (deployed via the Helm chart).
 
+## Documentation standard (docs/)
+
+Every product repo carries the same docs set (GitBook Git-synced via
+`.gitbook.yaml`, nav in `docs/SUMMARY.md`):
+`overview.md setup.md prd.md decisions.md roadmap.md design.md pages.md
+architecture.md data-model.md api.md engineering.md deployment.md features.md
+flows/ (auth + core product flows) api/openapi.yaml` + product-specific
+contracts (e.g. tax-engine, capture-qc, analytics-math, query-grammar).
+Claims are marked **[Current] / [PRD] / [Directive] / [Proposed] / [Decided]**;
+`decisions.md` is the ratification register — other docs defer to it.
+`features.md` is the granular build backlog (stable IDs, referenced in PRs as
+`feat(F0-3): …`).
+
+## Ecosystem API conventions
+
+- Versioned base path `/api/v1` (products) — upstat's public surfaces use
+  `/v1` (events/stats/query are cross-product infrastructure).
+- Error envelope `{"error": {"code", "message", "details?"}}`; codes are
+  **snake_case and stable**, owned by the flow docs (never invented in code
+  review). Cross-tenant access returns `404`, never `403`.
+- Cursor pagination (`?cursor=&limit=`, default 50).
+- `Idempotency-Key` header on any client-retryable mutation (uploads,
+  payments, submissions) — retries must never duplicate.
+- Rate limits per engineering.md; `429` + `Retry-After`.
+- Auth: Firebase ID-token bearer (Google-only); machine identities
+  (service tokens, property keys) never grant user-API access.
+
+## Analytics events rule
+
+Upstat's `docs/api.md` consumer registry is the **master event registry** for
+the ecosystem. Events are counters + registered coarse dims only — never
+measurement values, amounts, descriptions, or PII. Adding an event = update
+the registry first, then instrument.
+
+## Design documentation standard
+
+Each repo's `design.md` defines: reference feel, color tokens (mirrored as
+Figma variables in `<product>/tokens`, light/dark groups), type scale,
+layout, component inventory, a numbered microinteraction catalog (`MI-n`,
+referenced from pages.md), accessibility/motion rules, and the **shared
+foundations block** — spacing scale (4px grid: 4/8/12/16/24/32/48/64),
+breakpoints (640/768/1024/1280/1536), motion durations (120/200/250/300ms) +
+easings, z-index layers (0/10/20/30/40/50), **Lucide** icons, focus ring
+(2px accent, offset 2, :focus-visible). The foundations rows are identical
+across products — changing one is an ecosystem PR touching all three.
+
 ## Recommended versions
 Keep current; last reviewed with the values below.
 
