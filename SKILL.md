@@ -276,6 +276,11 @@ flutter mobile ────────────┘  Google auth
 - AI features use **Vertex AI** (Gemini via `aiplatform.googleapis.com`, ADC —
   see `cuesoft-iac/functions/cueprise-gemini-proxy`); no consumer AI-vendor
   API keys in cloud deployments. Self-host fallback: BYO Gemini/Groq env keys.
+- Environments & deploy gating: `stg` = sandbox is the ONLY environment for
+  CueLABS products (no production); Doppler config `stg` holds its secrets.
+  **Open-source deviation from the cueprise flow**: merge-to-main never
+  deploys (build+test only); deploys fire **only on `v*` tag creation**,
+  gated by a tag ruleset (owner-level) + protected GitHub environment.
 - Data plane (cloud): per-product choice of **Aiven Postgres** or **Firestore**
   (Firebase-native/real-time products → Firestore; financial/relational →
   Postgres). Shared **Aiven Redis** with `REDIS_DB`-index tenancy per
