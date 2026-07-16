@@ -282,6 +282,9 @@ flowchart LR
   **Open-source deviation from the cueprise flow**: merge-to-main never
   deploys (build+test only); deploys fire **only on `v*` tag creation**,
   gated by a tag ruleset (owner-level) + protected GitHub environment.
+- Transactional email: **Brevo REST API** only (`BREVO_API_KEY/FROM_EMAIL/
+  FROM_NAME` via Doppler; irealty is the reference) — **no SMTP** in any
+  CueLABS product.
 - Data plane (cloud): per-product choice of **Aiven Postgres** or **Firestore**
   (Firebase-native/real-time products → Firestore; financial/relational →
   Postgres). Shared **Aiven Redis** with `REDIS_DB`-index tenancy per
@@ -289,7 +292,11 @@ flowchart LR
   the env source of truth — project per repo, configs `dev / dev_personal /
   stg / prd`. Object storage: the sandbox project's default **Cloud Storage** bucket
   with per-product/env prefixes. Self-host compose bundles its own stores.
-- gRPC services front a gRPC-Web Envoy proxy (deployed via the Helm chart).
+- Protocols (X-8): **HTTP/JSON everywhere**; gRPC only where the domain
+  demands it (upstat: OTLP ingest + internal s2s; its browser gRPC-Web/Envoy
+  path is sunsetting at monitors-v2). Cloud Run requires end-to-end HTTP/2
+  (h2c) for gRPC services. Self-host Helm still deploys Envoy while the
+  gRPC-Web path exists.
 
 ## Documentation standard (docs/)
 
@@ -304,6 +311,31 @@ Claims are marked **[Current] / [PRD] / [Directive] / [Proposed] / [Decided]**;
 `features.md` is the granular build backlog (stable IDs, referenced in PRs as
 `feat(F0-3): …`).
 
+**Canonical section skeletons** (same H2 spine in every repo; product-specific
+deep-dive sections slot between the fixed ones):
+- `prd.md`: Product definition · Personas/JTBD · Functional requirements ·
+  Non-goals · Brand & content · Compliance & safety · Success metrics · Open
+  questions · Scope expansions (dated).
+- `architecture.md`: 1 Context—current · 2 Context—target · 3 Service
+  breakdown · 4 Core sequences · (product deep-dives) · Deployment view ·
+  Cross-repo dependencies · dated expansion sections.
+- `data-model.md`: Current entities · Target additions · Storage/identity
+  mapping · Classification & retention · dated expansions.
+- `api.md`: Current surface (+ topology table where multi-service) · Target
+  surface · Gap analysis · Conventions · dated expansions.
+- `engineering.md`: Error catalog · Authz matrix · Rate limits · Testing ·
+  Logging · Acceptance · CORS contract.
+- `deployment.md`: Topology · Provisioning (cuesoft-iac) · CI/CD (tag-gated,
+  X-6) · Runtime contract (sizing/domains/rollback) · Not in this phase.
+- `design.md`: Principles · Foundations (incl. the shared block) · Components ·
+  MI catalog · Accessibility & motion · Platform parity · Figma Style Guide.
+- `pages.md`: Part A home · Part B dashboard · Part C mobile · feature
+  register delta. `features.md`: Phase tables (ID/unit/delivers/refs/deps) +
+  cross-phase units. `flows/*`: numbered contract sections ending in
+  Instrumentation & Acceptance.
+- All mermaid diagrams must parse (validate with mermaid-cli before merge —
+  invalid blocks render as plaintext on GitBook); no ASCII diagrams.
+
 ## Ecosystem API conventions
 
 - Versioned base path `/api/v1` (products) — upstat's public surfaces use
@@ -317,6 +349,18 @@ Claims are marked **[Current] / [PRD] / [Directive] / [Proposed] / [Decided]**;
 - Rate limits per engineering.md; `429` + `Retry-After`.
 - Auth: Firebase ID-token bearer (Google-only); machine identities
   (service tokens, property keys) never grant user-API access.
+
+## Environment-variable naming standard
+
+Identical names across all repos (Doppler `<project>/stg` is the source of
+values; `.env.example` documents names with dev-safe defaults):
+`PORT` · `CORS_ORIGINS` (comma-separated exact origins — the only CORS var;
+never ALLOWED_ORIGINS/FRONTEND_URL) · `REDIS_HOST/PORT/USERNAME/PASSWORD/TLS/DB`
+(discrete, irealty pattern) · `BREVO_API_KEY/FROM_EMAIL/FROM_NAME` ·
+`GOOGLE_CLOUD_PROJECT` · `SERVICE_TOKEN_HASH` (server side of s2s token
+validation) · DB: `MONGO_URI`+`MONGO_DB` (Mongo era) / `DATABASE_URL`
+(Postgres era) / ADC for Firestore. CORS behaviour contract lives in each
+repo's engineering.md ("CORS contract" section).
 
 ## Analytics events rule
 
