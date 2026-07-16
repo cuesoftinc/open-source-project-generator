@@ -271,6 +271,30 @@ flowchart LR
   tokens with `sign_in_provider != google.com`; UI ships exactly one
   "Continue with Google" CTA. Sandbox identity project: `sandbox-e306a`;
   `account.cuesoft.io` is a future facade over the same Firebase project.
+- Identity, profile & KYC tiers (X-10): layered on the auth standard above —
+  Google sign-in stays the sole credential; tiers add profile data and
+  verification, **never alternative logins**. **Tier 0 — Google identity**
+  (all products): firebase_uid + Google-verified email; grants all read/basic
+  use. **Tier 1 — self-attested profile & location** (captured in product
+  profile/settings; sensitive PII, never logged): apparule = bio + profile
+  location {city, state, country} powering proximity-ranked designer
+  recommendations and delivery-address pre-fill (the delivery address itself
+  stays frozen per order); expendit = tax-jurisdiction location
+  (state_of_residence for individuals, registered_address for company orgs)
+  which resolves the remittance authority (State IRS vs FIRS); upstat = org
+  timezone (IANA) only, for report rendering and time-bucketing —
+  deliberately the entire upstat requirement. **Tier 2 — provider-verified
+  financial identity** (only where money moves or government filings
+  generate): store provider refs + verification state, **never raw
+  government IDs** — apparule designer payouts = Paystack BVN-backed bank
+  resolution (the ecosystem pattern); expendit filing identity = TIN
+  (+ RC number + registered address for companies) gated at filing-pack
+  generation; upstat = N/A until billing enters the PRD. Rules: tiers gate
+  capabilities, never sign-in; KYC state machines + error codes live in flow
+  docs (apparule's kyc_incomplete/post_unavailable is the template); tier-2
+  fields are high-sensitivity in every data-model.md §4 classification;
+  verification is delegated to the money/filing provider — no in-house
+  document review.
 - Backends deploy to GCP Cloud Run (provisioned via the `cuesoft-iac` Pulumi
   ecosystem — never ad-hoc); frontends deploy to Firebase App Hosting; the
   Helm chart remains the self-host path.
