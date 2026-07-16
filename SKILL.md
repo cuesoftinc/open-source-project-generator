@@ -389,7 +389,9 @@ the registry first, then instrument.
 ## Design documentation standard
 
 Each repo's `design.md` defines: reference feel, color tokens (mirrored as
-Figma variables in `<product>/tokens`, light/dark groups), type scale,
+Figma variables in `<product>/tokens` with **true Light/Dark modes**; plus
+foundations variables — spacing, radii, durations, z-index — in the same
+collection), type scale,
 layout, component inventory, a numbered microinteraction catalog (`MI-n`,
 referenced from pages.md), accessibility/motion rules, and the **shared
 foundations block** — spacing scale (4px grid: 4/8/12/16/24/32/48/64),
