@@ -358,7 +358,8 @@ metrics (Meter API: counters/histograms per service KPIs), logs (slog/logging
 bridges). W3C `traceparent` propagates across all service boundaries.
 Export = **direct OTLP from the SDK** (BatchSpan/LogRecord processors);
 collector sidecar = later upgrade path, never a v1 requirement. **Receiver =
-upstat's OTLP gateway** (4317 gRPC / 4318 HTTP, ingest-key header) — CueLABS
+upstat's OTLP gateway** (4317 gRPC / 4318 HTTP, ingest-key header; sibling
+exporters default to OTLP/HTTP — only upstat ever hosts gRPC, X-8) — CueLABS
 products dogfood upstat for their own observability. Export is env-gated:
 no OTEL_EXPORTER_OTLP_ENDPOINT → SDK no-ops (pre-OBS-001 posture). JSON
 stdout logging remains alongside (Cloud Run native). Operational telemetry
