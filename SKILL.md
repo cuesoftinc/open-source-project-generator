@@ -264,8 +264,15 @@ flutter mobile ────────────┘  Google auth
                                          data: Firebase Firestore & Storage,
                                                Firebase (apparule), MongoDB (+ Redis) elsewhere
 ```
-- Auth: Firebase Authentication / Google sign-in.
-- Backends deploy to GCP Cloud Run (and/or the Helm chart for k8s).
+- Auth: Firebase Authentication, **Google sign-in ONLY** — no username/password
+  signup or login anywhere in the ecosystem. Enforce at three layers:
+  Email/Password provider disabled on the Firebase project; backends reject
+  tokens with `sign_in_provider != google.com`; UI ships exactly one
+  "Continue with Google" CTA. Sandbox identity project: `sandbox-e306a`;
+  `account.cuesoft.io` is a future facade over the same Firebase project.
+- Backends deploy to GCP Cloud Run (provisioned via the `cuesoft-iac` Pulumi
+  ecosystem — never ad-hoc); frontends deploy to Firebase App Hosting; the
+  Helm chart remains the self-host path.
 - gRPC services front a gRPC-Web Envoy proxy (deployed via the Helm chart).
 
 ## Recommended versions
