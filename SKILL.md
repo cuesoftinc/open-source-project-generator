@@ -424,6 +424,37 @@ easings, z-index layers (0/10/20/30/40/50), **Lucide** icons, focus ring
 (2px accent, offset 2, :focus-visible). The foundations rows are identical
 across products — changing one is an ecosystem PR touching all three.
 
+### Figma component-library standard
+
+How each product's Figma library is built (ratified from the
+apparule/expendit/upstat library builds, 2026-07):
+
+- **Token pairing** — every accent/brand fill token pairs with an
+  `on-accent`/`on-brand` color token for the ink rendered on it. Raw hex is
+  allowed **only** for documented exceptions: on-media camera UI, gradient
+  stops (Figma cannot bind variables to them), effect/shadow colors, and
+  crit-fill labels pending an `on-crit` token.
+- **Theme delivery** — dark mode ships as **true Light/Dark variable modes**
+  on `<product>/tokens`, never as `theme` variant axes on components.
+  Both-mode QA preview frames with **live instances** are mandatory.
+- **Library organization** — the Components page holds an "About" README
+  card + stage frames in one left-aligned column (240px gaps), with QA
+  frames in a parallel right column. File page order: Style Guide →
+  Components → (Assets) → surfaces → Deprecated. Run a zero-overlap check
+  before shipping.
+- **Naming** — PascalCase component sets; lowercase variant properties
+  (`kind`, `size`, `state`, …); icons `icon/<lucide-slug>`, brand glyphs
+  `icon/brand-<name>` (brand marks keep their official colors, unbound).
+  The ecosystem auth CTA component is **`GoogleAuthButton`** (X-1).
+- **Engineering practices** — auto-layout everywhere; every color
+  variable-bound; tint overlays are instance-safe rects using **node-level**
+  opacity (Figma drops paint-level opacity on variable-bound instance
+  fills); component descriptions carry the MI/motion notes and **[Decided]**
+  mappings that apply to them; OpenType tabular figures (`tnum`) must be
+  toggled manually — the plugin API cannot set font features.
+- **Content** — photography must be licensed, with attributions rendered on
+  the Assets page; screens assemble from component instances **only**.
+
 ## Recommended versions
 Keep current; last reviewed with the values below.
 
