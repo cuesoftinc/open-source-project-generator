@@ -276,6 +276,13 @@ flutter mobile ────────────┘  Google auth
 - AI features use **Vertex AI** (Gemini via `aiplatform.googleapis.com`, ADC —
   see `cuesoft-iac/functions/cueprise-gemini-proxy`); no consumer AI-vendor
   API keys in cloud deployments. Self-host fallback: BYO Gemini/Groq env keys.
+- Data plane (cloud): per-product choice of **Aiven Postgres** or **Firestore**
+  (Firebase-native/real-time products → Firestore; financial/relational →
+  Postgres). Shared **Aiven Redis** with `REDIS_DB`-index tenancy per
+  product/config (irealty pattern: discrete `REDIS_*` vars). **Doppler** is
+  the env source of truth — project per repo, configs `dev / dev_personal /
+  stg / prd`. Object storage: the sandbox project's default **Cloud Storage** bucket
+  with per-product/env prefixes. Self-host compose bundles its own stores.
 - gRPC services front a gRPC-Web Envoy proxy (deployed via the Helm chart).
 
 ## Recommended versions
