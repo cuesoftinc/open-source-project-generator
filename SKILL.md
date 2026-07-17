@@ -359,6 +359,10 @@ deep-dive sections slot between the fixed ones):
   Instrumentation & Acceptance.
 - All mermaid diagrams must parse (validate with mermaid-cli before merge —
   invalid blocks render as plaintext on GitBook); no ASCII diagrams.
+- Landing dual-audience rule: the product landing page (`pages.md` Part A)
+  must sell to **both** contributor-developers (stack, interesting problems,
+  good-first-issues, community links) and self-hosting adopters
+  (data-ownership pitch, one-line install, what ships) — with an FAQ.
 
 ## Ecosystem API conventions
 
@@ -454,6 +458,13 @@ apparule/expendit/upstat library builds, 2026-07):
   toggled manually — the plugin API cannot set font features.
 - **Content** — photography must be licensed, with attributions rendered on
   the Assets page; screens assemble from component instances **only**.
+- **Canvas hygiene** — design canvases carry **product copy only**; spec
+  annotations (MI references, requirement IDs, implementation notes) belong
+  in component descriptions and the docs, never inside screen frames.
+- **Screen states** — every data-driven screen template ships **default +
+  empty + loading** frames: empty uses the `EmptyState` component with real
+  first-run copy (plus a demo-data toggle where the product specs one);
+  loading uses `Skeleton` primitives.
 
 ## Recommended versions
 Keep current; last reviewed with the values below.
