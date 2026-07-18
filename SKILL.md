@@ -560,6 +560,14 @@ How each product's `web/` app is built (ratified 2026-07-18):
   (feature-scoped hooks/orchestration that own all state); views =
   `src/app/**` routes + composed components, render-only. **Views never
   fetch.**
+- **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
+  public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
+  legacy auth paths are quarantined or redirect to `/signin`); every
+  authenticated app surface nests under `/dashboard/<area>` (`/dashboard`
+  = the B1 overview; e.g. `/dashboard/transactions`, `/dashboard/orders`,
+  `/dashboard/logs`); the dev-only component gallery is `/dev/components`
+  (excluded from production builds); the mock API mounts at
+  `/api/mock/v1/*` mirroring `/api/v1/*` path-for-path.
 - **TEST_MODE contract** — `NEXT_PUBLIC_TEST_MODE=1` makes
   `GoogleAuthButton` navigate straight to the dashboard (no Firebase) and
   points the API client at the in-app mock server. Auth sits behind an
