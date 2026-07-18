@@ -317,9 +317,18 @@ flowchart LR
   Playwright (TEST_MODE)" (`playwright install --with-deps chromium →
   test:e2e`), api/mobile jobs follow the same naming pattern; action steps
   pin the LATEST major of official actions — currently
-  `actions/checkout@v7` and `actions/setup-node@v7` (verify via
+  `actions/checkout@v7`, `actions/setup-node@v7`,
+  `actions/upload-artifact@v7` (verify via
   `gh api repos/actions/<name>/releases/latest` when touching workflows,
-  never copy stale versions from older files)) and the
+  never copy stale versions from older files). **Shared jobs are
+  BYTE-IDENTICAL across repos** (2026-07-18: one canonical file, same
+  shasum in all three products) — repo variance lives in `package.json`
+  scripts, never in workflow YAML; named steps only (Checkout · Setup Node ·
+  Install dependencies · Lint · Typecheck · Unit & integration tests ·
+  Build (TEST_MODE with `NEXT_PUBLIC_TEST_MODE: "1"`)); the e2e job builds
+  in TEST_MODE, installs chromium, runs `test:e2e` with TEST_MODE+CI env,
+  and uploads `web/playwright-report` as artifact `playwright-report`
+  (retention 7) on failure) and the
   tag-gated `release.yml` (X-6; getpp/cueprise are the deploy-pattern
   references). New workflow files beyond these two families are a standards
   deviation and need ratification.
