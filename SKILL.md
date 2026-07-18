@@ -306,6 +306,27 @@ flowchart LR
   **Open-source deviation from the cueprise flow**: merge-to-main never
   deploys (build+test only); deploys fire **only on `v*` tag creation**,
   gated by a tag ruleset (owner-level) + protected GitHub environment.
+- **GitHub Actions standard (uniform across repos, ratified 2026-07-18)**:
+  exactly two workflow families, identical names and shape in every repo —
+  `.github/workflows/build-and-test.yml` (workflow name `build-and-test`;
+  triggers `push: branches [main]` + `pull_request`, no path filters —
+  surfaces join as jobs; `permissions: contents: read`; `concurrency:
+  build-and-test-${{ github.ref }}` with cancel-in-progress; one job per
+  surface: `web` = "web · lint + typecheck + unit + build" on Node 22
+  (`npm ci → lint → typecheck → test → build`), `web-e2e` = "web ·
+  Playwright (TEST_MODE)" (`playwright install --with-deps chromium →
+  test:e2e`), api/mobile jobs follow the same naming pattern) and the
+  tag-gated `release.yml` (X-6; getpp/cueprise are the deploy-pattern
+  references). New workflow files beyond these two families are a standards
+  deviation and need ratification.
+- **Test layout standard (uniform across repos, 2026-07-18)**: unit/
+  integration tests co-locate with their source as `<name>.test.ts(x)`
+  (component `Button.test.tsx` beside `Button.tsx`; kebab for module tests);
+  Playwright e2e specs live in `web/e2e/<flow>.spec.ts` (flow names mirror
+  the design.md §8.4 prototype journeys) with `playwright.config.ts` at the
+  web root; npm scripts are `test` (unit), `test:e2e` (Playwright), `lint`,
+  `typecheck` in every web app. Legacy `__tests__/` folders survive only
+  inside `src/legacy/`.
 - Transactional email: **Brevo REST API** only (`BREVO_API_KEY/FROM_EMAIL/
   FROM_NAME` via Doppler; irealty is the reference) — **no SMTP** in any
   CueLABS product.
