@@ -496,6 +496,72 @@ apparule/expendit/upstat library builds, 2026-07):
   fixes are verified per-item against the finding ledger in the next
   round.
 
+## Web implementation standard
+
+How each product's `web/` app is built (ratified 2026-07-18):
+
+- **Stack** — Next.js 16 App Router + React 19 + TypeScript; Tailwind
+  utilities map to the token CSS variables. New-system components are
+  token/Tailwind-based everywhere; expendit migrates progressively off MUI,
+  which survives only inside `src/legacy/` until retired.
+- **Design tokens** — `web/src/design/tokens.css` holds CSS custom
+  properties mirroring design.md §2 exactly: colors as light `:root` / dark
+  `[data-theme="dark"]` (honoring `prefers-color-scheme` with manual
+  override), spacing 4–64, radii, durations + easings, z-index layers, the
+  series palette where the product has one, and on-accent/on-brand inks.
+  **No raw hex in components** — the same rule as Figma; documented
+  exceptions carry a code comment.
+- **Components** — `web/src/components/ui/<Name>.tsx`: one module per Figma
+  component set, named exactly as the set (PascalCase); props mirror the
+  variant axes (`kind`/`size`/`state`/…); design.md §4 microinteractions
+  are implemented with duration/easing tokens and `prefers-reduced-motion`
+  fallbacks; every component is unit-tested.
+- **MVC layering** — models = `src/models/` (typed entities per
+  data-model.md + repositories per api.md/openapi.yaml — the **only** layer
+  that talks to the network); controllers = `src/controllers/`
+  (feature-scoped hooks/orchestration that own all state); views =
+  `src/app/**` routes + composed components, render-only. **Views never
+  fetch.**
+- **TEST_MODE contract** — `NEXT_PUBLIC_TEST_MODE=1` makes
+  `GoogleAuthButton` navigate straight to the dashboard (no Firebase) and
+  points the API client at the in-app mock server. Auth sits behind an
+  `AuthProvider` interface (`TestModeAuthProvider` now;
+  `FirebaseAuthProvider` added at backend-integration time — X-1
+  Google-only either way).
+- **Mock server** — Next route handlers under `src/app/api/mock/*`
+  implement the documented API surface the web needs (paths, snake_case
+  error codes, and taxonomies from api.md/openapi.yaml), backed by a seeded
+  in-memory store with full CRUD (dev-persistent via a module singleton).
+  Seed data reproduces the docs/Figma mock narratives so the app boots
+  looking like the designs; contract types are shared with models.
+- **Tests** — Vitest + Testing Library for unit/integration (components,
+  controllers, mock handlers); Playwright e2e mirrors the design.md §8.4
+  prototype journeys, run in TEST_MODE against the mock server. Both wire
+  into CI build+test (X-6: merge-to-main never deploys).
+- **Legacy / dead-code quarantine** — before replacement, legacy trees are
+  `git mv`-ed into `web/src/legacy/` (structure preserved, excluded from
+  build & routing); live paths carry **zero dead code**. Once the
+  replacement passes QA + Playwright, the legacy subtree is deleted in a
+  dedicated `chore(web): retire legacy <area>` PR. No dead code outside
+  `src/legacy/`, ever; `src/legacy/` itself trends to empty.
+- **Component reuse policy** — pixel-fidelity to the Figma files wins: all
+  **visual** components are built in-house from the token layer — no styled
+  component kits in new code (no new MUI, no shadcn/DaisyUI skins) and no
+  chart libraries (charts are bespoke SVG built to the Figma chart specs).
+  Reuse is allowed only where it is invisible: headless behavior primitives
+  (Radix/Base UI class — dialog, popover, select, tabs, switch, checkbox,
+  tooltip, accordion semantics with focus traps, keyboard nav, ARIA),
+  positioning engines (Floating UI), **lucide-react** (the design system's
+  own icon set — matches by construction; brand glyphs as local SVGs), and
+  math/format utilities (d3-scale, date-fns, clsx). Fidelity is verified
+  against the Figma files in the stage QA loops (screenshot comparison +
+  token/geometry checks).
+- **Process** — stages W0 foundations → W1 components → W2 home → W3
+  dashboards, one PR per stage per repo; conventional commits; a stage
+  closes only after its QA loop evaluates the implementation against the
+  Figma files (tokens, geometry, states, interactions). Docs + this SKILL
+  are updated with every deviation.
+
 ## Recommended versions
 Keep current; last reviewed with the values below.
 
