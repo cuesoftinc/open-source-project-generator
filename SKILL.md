@@ -476,6 +476,25 @@ apparule/expendit/upstat library builds, 2026-07):
   empty + loading** frames: empty uses the `EmptyState` component with real
   first-run copy (plus a demo-data toggle where the product specs one);
   loading uses `Skeleton` primitives.
+- **Prototyping standard** — core journeys are wired as **named flow
+  starting points** per page. Conventions: `ON_CLICK` → `NAVIGATE`;
+  `DISSOLVE` 150-200ms for nav/tab switches; `SMART_ANIMATE` for
+  pushes/backs; `AFTER_TIMEOUT` for async verification states.
+  Empty/loading/QA/index frames stay out of the flow. Reachability is
+  proven by BFS over the reaction graph — no unreachable core screens, no
+  dead ends besides terminals. Cross-page links use the
+  **move-wire-restore** technique: the API rejects creating cross-page
+  `NAVIGATE`, but reactions persist when the source frame is temporarily
+  moved to the destination page, wired, and returned.
+- **Design QA loop** — before design sign-off, run audit → fix → re-verify
+  rounds to convergence with **independent auditors** (not the builders)
+  across three lenses: **completeness** (docs contract + states +
+  prototype graph), **content** (wording, geometry on the 4px scale,
+  placement, and data coherence — one narrative across screens: dates,
+  ledgers, registries, role perspectives), and **polish** (mode flips,
+  contrast, stray objects, rhythm). Findings carry node ids + severities;
+  fixes are verified per-item against the finding ledger in the next
+  round.
 
 ## Recommended versions
 Keep current; last reviewed with the values below.
