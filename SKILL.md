@@ -560,6 +560,14 @@ How each product's `web/` app is built (ratified 2026-07-18):
   (feature-scoped hooks/orchestration that own all state); views =
   `src/app/**` routes + composed components, render-only. **Views never
   fetch.**
+- **Canonical libraries (uniform across products, 2026-07-18)** —
+  interactive/behavior primitives use **Radix UI** (`@radix-ui/react-*`:
+  dialog, popover, select, switch, tooltip, tabs, checkbox, radio,
+  accordion); positioning-only cases may use Floating UI; the date library
+  is **date-fns** (never dayjs/moment in new code); class composition via
+  `clsx`; icons via `lucide-react` + inline brand SVGs. Known deviation:
+  upstat's W1 overlays are hand-rolled on Floating UI — converges to Radix
+  in its next web stage.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   legacy auth paths are quarantined or redirect to `/signin`); every
