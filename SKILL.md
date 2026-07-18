@@ -359,7 +359,11 @@ flowchart LR
 ## Documentation standard (docs/)
 
 Every product repo carries the same docs set (GitBook Git-synced via
-`.gitbook.yaml`, nav in `docs/SUMMARY.md`):
+`.gitbook.yaml`, nav in `docs/SUMMARY.md`; doc H1s are
+`<Product> — <Title>` and the SUMMARY nav label is exactly the H1 minus
+the product prefix — e.g. `# Apparule — Web Implementation Standard` →
+`[Web Implementation Standard](web-implementation.md)`; labels must match
+across repos):
 `overview.md setup.md prd.md decisions.md roadmap.md design.md pages.md
 architecture.md data-model.md api.md engineering.md deployment.md features.md
 flows/ (auth + core product flows) api/openapi.yaml` + product-specific
