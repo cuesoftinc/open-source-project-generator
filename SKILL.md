@@ -461,6 +461,17 @@ apparule/expendit/upstat library builds, 2026-07):
 - **Canvas hygiene** — design canvases carry **product copy only**; spec
   annotations (MI references, requirement IDs, implementation notes) belong
   in component descriptions and the docs, never inside screen frames.
+- **Design accuracy** — marketing/design surfaces carry **no fabricated
+  third-party statistics** (GitHub stars, member/user/download counts), no
+  invented pricing or plan claims (until pricing is decided the only
+  permitted lines are "self-hosting is free forever" / "cloud pricing
+  announced at GA"), no invented SLAs or research statistics, and no
+  implied customer endorsements. Product claims are framed as
+  targets/capabilities ("we target ±2 cm"), demo data is clearly synthetic,
+  and license claims match the repo `LICENSE` (all three products: MIT).
+  GitHub badges render as glyph + "Star" with **no count**. (Ratified from
+  the 2026-07-18 sweep — all three products had independently violated
+  this.)
 - **Screen states** — every data-driven screen template ships **default +
   empty + loading** frames: empty uses the `EmptyState` component with real
   first-run copy (plus a demo-data toggle where the product specs one);
