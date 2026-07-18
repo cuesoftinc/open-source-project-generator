@@ -315,7 +315,11 @@ flowchart LR
   surface: `web` = "web · lint + typecheck + unit + build" on Node 22
   (`npm ci → lint → typecheck → test → build`), `web-e2e` = "web ·
   Playwright (TEST_MODE)" (`playwright install --with-deps chromium →
-  test:e2e`), api/mobile jobs follow the same naming pattern) and the
+  test:e2e`), api/mobile jobs follow the same naming pattern; action steps
+  pin the LATEST major of official actions — currently
+  `actions/checkout@v7` and `actions/setup-node@v7` (verify via
+  `gh api repos/actions/<name>/releases/latest` when touching workflows,
+  never copy stale versions from older files)) and the
   tag-gated `release.yml` (X-6; getpp/cueprise are the deploy-pattern
   references). New workflow files beyond these two families are a standards
   deviation and need ratification.
