@@ -747,13 +747,19 @@ URLs); `<Product>` = display name.
   i18n by ratified decision 2026-07-19) and a security-policy affordance
   linking `https://github.com/cuesoftinc/<product>/blob/main/SECURITY.md`
   — both styled per product design but present everywhere.
-- **Marketing nav** (same counts everywhere): 4 text links — Features ·
-  product slot (same slot as the footer) · Docs (GitBook root) · GitHub —
-  plus the ThemeToggle control and the "Sign in" CTA (`/signin`).
-  **Mobile**: below `md` the text links collapse into a menu-button
-  disclosure (hamburger, `aria-expanded`) opening a panel with the same
-  4 links + ThemeToggle + Sign in; no canonical link may be unreachable
-  at any viewport (ratified 2026-07-19 from review finding).
+- **Marketing nav** (same composition everywhere, [Revised 2026-07-19]):
+  4 text links — Features · product slot (same slot as the footer) · Docs
+  (GitBook root) · GitHub, where the GitHub item renders as a compact
+  **star badge** (star glyph + "Star" + live count fetched client-side
+  from the repo's `stargazers_count`, cached; TEST_MODE or fetch failure
+  → neutral "Star" with no number — counts are NEVER hardcoded, and
+  Figma canvases show the neutral badge) — plus the ThemeToggle control,
+  a "Sign in" **text link**, and the "Try Cloud" **primary CTA**
+  (`/signin`). **Mobile**: below `md` the text links collapse into a
+  menu-button disclosure (hamburger, `aria-expanded`) opening a panel
+  with the same 4 links + ThemeToggle + Sign in + Try Cloud; no
+  canonical link may be unreachable at any viewport (ratified 2026-07-19
+  from review finding).
 - **Theme toggle everywhere** — every product ships light/dark switching
   on the marketing nav AND the dashboard chrome (rail/top bar) and in
   settings. Contract = apparule's `src/design/ThemeProvider.tsx`
