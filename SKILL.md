@@ -736,7 +736,10 @@ URLs); `<Product>` = display name.
   - *Community* (4): GitHub `https://github.com/cuesoftinc/<product>` ·
     Discord `https://discord.gg/CDfZxxrxbb` · Roadmap
     `https://cuesoft.gitbook.io/<product>/product/roadmap` · CueLABS
-    `https://cuelabs.cuesoft.io`.
+    `https://cuelabs.cuesoft.io`. Discord channel copy anywhere in the
+    product reads **`#<product>-lab`** (`#apparule-lab` / `#expendit-lab`
+    / `#upstat-lab` — the real channels on the CueLABS server; channel
+    names are never invented).
   - *Legal* (3): Privacy `https://privacy.cuesoft.io` · Terms
     `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
 - **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
