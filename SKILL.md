@@ -761,6 +761,12 @@ URLs); `<Product>` = display name.
   link labels/anchor text (the footer Community column link reads
   "CueLABS™") — is written **CueLABS™** (trademark symbol). The ONLY
   exemption is literal URLs/hostnames (`https://cuelabs.cuesoft.io`).
+  **Brand copy (user-ratified 2026-07-19)**: the product attribution
+  line reads "An open-source product by CueLABS™" — never
+  "by Cuesoft CueLABS™" (the legal bar already establishes CueLABS™ as
+  a Cuesoft Inc. division). The compound **"open-source" is always
+  hyphenated** in UI copy, docs, and canvases (URLs/slugs keep their
+  own spelling).
   - *Legal* (3): Privacy `https://privacy.cuesoft.io` · Terms
     `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
 - **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
