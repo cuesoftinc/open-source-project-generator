@@ -620,7 +620,13 @@ How each product's `web/` app is built (ratified 2026-07-18):
   MAIN CONTENT column in BOTH rail states — no clipped or overflowing
   charts/tables/grids with the rail expanded, especially at 1024–1440
   where the expanded rail squeezes the column hardest; the e2e route
-  sweep runs with the rail expanded too.
+  sweep runs with the rail expanded too. **On mobile (`<md`) the
+  expanded rail NEVER squeezes content** (user-ratified 2026-07-19):
+  expansion renders as an overlay drawer above the content with a
+  scrim (content keeps full width beneath; scrim tap / Escape closes),
+  and a desktop-persisted expanded state does not apply below `md` —
+  mobile always boots with the collapsed rail. e2e at 390: expanding
+  overlays (content width unchanged), scrim closes.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   **[Directive 2026-07-19]** legacy paths get NO redirect stubs — once a
