@@ -746,6 +746,40 @@ How CueLABS™ work is executed with an orchestrator + subagents (ratified
   resolved divergence is codified HERE in the same pass (the
   "standardize constantly" rule) so drift becomes a detectable violation.
 
+## Web tooling parity canon
+
+Ratified 2026-07-19 (converged via the cross-repo tooling-parity pass; the
+listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
+
+- **Scripts** — identical name set in every `web/package.json`:
+  `dev / build / start / lint / lint:fix / typecheck / test / test:watch /
+  test:e2e / check:boundaries`. Compositions pinned: `lint` =
+  `prettier --check` + eslint + `check:boundaries`; `typecheck` =
+  `next typegen && tsc --noEmit`; `test` = `vitest run`.
+- **Boundaries** — ONE byte-identical `web/scripts/check-boundaries.mjs`:
+  engine = superset rule library (legacyImport, forbiddenImports, rawHex,
+  fetchOnlyIn, viewBoundaries); per-repo active-rule lists live in a
+  marked config section keyed by `package.json` name; every rule is
+  negative-tested (fires on an injected violation).
+- **Prettier** — byte-identical `.prettierrc`/`.prettierignore`; one brace
+  glob `**/*.{ts,tsx,js,jsx,mjs,cjs}` (prettier hard-errors on
+  zero-match patterns — never enumerate separate globs).
+- **Vitest** — canonical config: `@vitejs/plugin-react` +
+  `vite-tsconfig-paths` + root `./vitest.setup.ts`, jsdom default.
+  Repo-specific needs stay as COMMENTED, labeled blocks (apparule: no
+  `NEXT_PUBLIC_TEST_MODE` in unit env — two suites assert the unset
+  defaults — plus its jsdom URL option).
+- **Playwright** — `PW_PORT` env convention (defaults: apparule 3311 ·
+  expendit 3100 · upstat 3131), host `127.0.0.1`, e2e in CI mode =
+  `next start` against the prebuilt TEST_MODE app. upstat runs serial
+  (`workers: 1`) by design — shared mutable mock narrative.
+- **tsconfig** — byte-identical (route-types entries included).
+- **Catalogued non-parity (deliberate)**: per-repo `eslint.config.mjs`
+  extensions (expendit import bans + testing-library; upstat X-8
+  ignores) · Tailwind v3 (expendit) vs v4 (apparule/upstat) ·
+  `next.config.js` vs `.ts` · expendit-only `lint:staged`. Changing any
+  of these is an ecosystem decision, not repo drift.
+
 ## Marketing nav, footer & theme parity canon
 
 Ratified 2026-07-19. All products share ONE link inventory — same
