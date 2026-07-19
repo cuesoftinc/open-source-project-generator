@@ -607,7 +607,9 @@ How each product's `web/` app is built (ratified 2026-07-18):
   viewport at 1440 and 390.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
-  legacy auth paths are quarantined or redirect to `/signin`); every
+  **[Directive 2026-07-19]** legacy paths get NO redirect stubs — once a
+  replacement lands, old routes are deleted outright and 404 on the
+  branded page); every
   authenticated app surface nests under `/dashboard/<area>` (`/dashboard`
   = the B1 overview; e.g. `/dashboard/transactions`, `/dashboard/orders`,
   `/dashboard/logs`); the dev-only component gallery is `/dev/components`
@@ -733,8 +735,16 @@ URLs); `<Product>` = display name.
 - **Footer = brand block + 4 columns + legal bar.** Brand block:
   wordmark + one-line tagline. Columns (links pinned):
   - *Product* (4): Features · Try Cloud · Self Host · product slot
-    (apparule "For designers" · expendit "Pricing" · upstat
-    "Dashboards") — landing anchors/product routes.
+    (apparule "For designers" · expendit "Pricing" · upstat "Platform"
+    [Revised 2026-07-19 — was "Dashboards", which linked into the
+    auth-gated app; slots are MARKETING anchors, never app routes]) —
+    landing anchors only.
+  - *Community CTA placement* (2026-07-19): GitHub/Discord conversion
+    moments live in exactly three spots — the nav star badge, ONE
+    mid-page developers/community section (GitHub + Discord pair), and
+    the footer Community column. Additional bottom-section CTAs are
+    replaced with differentiated real destinations (status page, GitBook
+    deep links, roadmap, cuelabs.cuesoft.io).
   - *Docs* (4): Docs `https://cuesoft.gitbook.io/<product>` · Quickstart
     `…/setup` · API reference `…/system/api-surface` · Self-host guide
     `…/system/deployment`. (GitBook URL slugs = SUMMARY.md group/page,
@@ -784,6 +794,11 @@ URLs); `<Product>` = display name.
   (`curl -sIL`) when introduced; Playwright asserts the canonical hrefs
   on the marketing nav/footer and the theme toggle on both surfaces, so
   drift fails CI. Figma footer/nav masters carry the same inventory.
+  This includes URLs inside seed/mock data and defaults that render as
+  clickable links (EmptyState docsHref, demo runbook/monitor targets):
+  invented hostnames like `docs.<product>.cuesoft.io` are placeholders
+  that ship 404s — point them at the real GitBook pages (found live
+  2026-07-19 as a dead "Self-host docs" link).
 
 ## Recommended versions
 Keep current; last reviewed with the values below.
