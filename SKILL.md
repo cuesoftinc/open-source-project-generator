@@ -735,17 +735,16 @@ URLs); `<Product>` = display name.
     e.g. `product/roadmap`, `system/deployment`.)
   - *Community* (4): GitHub `https://github.com/cuesoftinc/<product>` ·
     Discord `https://discord.gg/CDfZxxrxbb` · Roadmap
-    `https://cuesoft.gitbook.io/<product>/product/roadmap` · CueLABS
-    `https://cuelabs.cuesoft.io` (link label — exempt from the brand-mark
-    rule below). Discord channel copy anywhere in the
+    `https://cuesoft.gitbook.io/<product>/product/roadmap` · CueLABS™
+    `https://cuelabs.cuesoft.io`. Discord channel copy anywhere in the
     product reads **`#<product>-lab`** (`#apparule-lab` / `#expendit-lab`
     / `#upstat-lab` — the real channels on the CueLABS™ server; channel
     names are never invented).
-- **Brand mark (ratified 2026-07-19)**: every non-link text occurrence of
-  the CueLABS™ name — docs, Figma canvases, UI copy, marketing prose —
-  is written **CueLABS™** (trademark symbol). Exempt: URLs
-  (`cuelabs.cuesoft.io`) and link labels/anchor text pointing at the
-  CueLABS™ site (e.g. the footer Community column's "CueLABS" link).
+- **Brand mark (ratified 2026-07-19)**: every text occurrence of the
+  CueLABS™ name — docs, Figma canvases, UI copy, marketing prose, AND
+  link labels/anchor text (the footer Community column link reads
+  "CueLABS™") — is written **CueLABS™** (trademark symbol). The ONLY
+  exemption is literal URLs/hostnames (`https://cuelabs.cuesoft.io`).
   - *Legal* (3): Privacy `https://privacy.cuesoft.io` · Terms
     `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
 - **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
