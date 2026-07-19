@@ -1,15 +1,15 @@
 ---
 name: oss-engineering-standards
 description: >-
-  The CueLABS repository standard for coding agents. Use when bootstrapping a
-  new CueLABS repo or standardizing an existing one (apparule, expendit, upstat,
+  The CueLABS™ repository standard for coding agents. Use when bootstrapping a
+  new CueLABS™ repo or standardizing an existing one (apparule, expendit, upstat,
   and future projects) — the canonical directory structure, per-service
   conventions, OSS community-health files, deploy layout, and cleanup rules.
 ---
 
-# CueLABS Engineering Standards
+# CueLABS™ Engineering Standards
 
-This skill encodes how CueLABS repositories are structured so a coding agent can
+This skill encodes how CueLABS™ repositories are structured so a coding agent can
 **bootstrap a new repo** or **standardize an existing one** consistently.
 Scaffolding is just directory creation, file templates, and standard tool
 invocations (`create-next-app`, `go mod init`, …), all of which an agent does
@@ -48,7 +48,7 @@ service exists — do not add empty `api/image` placeholders.
 
 ## Community health & config (required root files)
 
-**These files must have parity across all CueLABS repos** — byte-identical,
+**These files must have parity across all CueLABS™ repos** — byte-identical,
 sourced from [`templates/`](templates/). Only `README.md`, `CHANGELOG.md`,
 and `.github/dependabot.yml` are repo-specific (repo overview, its own history,
 and its own manifest scoping); everything else in the table below — including the
@@ -302,7 +302,7 @@ flowchart LR
   see `cuesoft-iac/functions/cueprise-gemini-proxy`); no consumer AI-vendor
   API keys in cloud deployments. Self-host fallback: BYO Gemini/Groq env keys.
 - Environments & deploy gating: `stg` = sandbox is the ONLY environment for
-  CueLABS products (no production); Doppler config `stg` holds its secrets.
+  CueLABS™ products (no production); Doppler config `stg` holds its secrets.
   **Open-source deviation from the cueprise flow**: merge-to-main never
   deploys (build+test only); deploys fire **only on `v*` tag creation**,
   gated by a tag ruleset (owner-level) + protected GitHub environment.
@@ -342,7 +342,7 @@ flowchart LR
   inside `src/legacy/`.
 - Transactional email: **Brevo REST API** only (`BREVO_API_KEY/FROM_EMAIL/
   FROM_NAME` via Doppler; irealty is the reference) — **no SMTP** in any
-  CueLABS product.
+  CueLABS™ product.
 - Data plane (cloud): per-product choice of **Aiven Postgres** or **Firestore**
   (Firebase-native/real-time products → Firestore; financial/relational →
   Postgres). Shared **Aiven Redis** with `REDIS_DB`-index tenancy per
@@ -425,7 +425,7 @@ bridges). W3C `traceparent` propagates across all service boundaries.
 Export = **direct OTLP from the SDK** (BatchSpan/LogRecord processors);
 collector sidecar = later upgrade path, never a v1 requirement. **Receiver =
 upstat's OTLP gateway** (4317 gRPC / 4318 HTTP, ingest-key header; sibling
-exporters default to OTLP/HTTP — only upstat ever hosts gRPC, X-8) — CueLABS
+exporters default to OTLP/HTTP — only upstat ever hosts gRPC, X-8) — CueLABS™
 products dogfood upstat for their own observability. Export is env-gated:
 no OTEL_EXPORTER_OTLP_ENDPOINT → SDK no-ops (pre-OBS-001 posture). JSON
 stdout logging remains alongside (Cloud Run native). Operational telemetry
@@ -659,7 +659,7 @@ How each product's `web/` app is built (ratified 2026-07-18):
 
 ## Orchestration & QA-loop standard
 
-How CueLABS work is executed with an orchestrator + subagents (ratified
+How CueLABS™ work is executed with an orchestrator + subagents (ratified
 2026-07-18; applies to design, web, and future phases):
 
 - **Roles** — one orchestrator + one agent per product/lane. The
@@ -736,10 +736,16 @@ URLs); `<Product>` = display name.
   - *Community* (4): GitHub `https://github.com/cuesoftinc/<product>` ·
     Discord `https://discord.gg/CDfZxxrxbb` · Roadmap
     `https://cuesoft.gitbook.io/<product>/product/roadmap` · CueLABS
-    `https://cuelabs.cuesoft.io`. Discord channel copy anywhere in the
+    `https://cuelabs.cuesoft.io` (link label — exempt from the brand-mark
+    rule below). Discord channel copy anywhere in the
     product reads **`#<product>-lab`** (`#apparule-lab` / `#expendit-lab`
-    / `#upstat-lab` — the real channels on the CueLABS server; channel
+    / `#upstat-lab` — the real channels on the CueLABS™ server; channel
     names are never invented).
+- **Brand mark (ratified 2026-07-19)**: every non-link text occurrence of
+  the CueLABS™ name — docs, Figma canvases, UI copy, marketing prose —
+  is written **CueLABS™** (trademark symbol). Exempt: URLs
+  (`cuelabs.cuesoft.io`) and link labels/anchor text pointing at the
+  CueLABS™ site (e.g. the footer Community column's "CueLABS" link).
   - *Legal* (3): Privacy `https://privacy.cuesoft.io` · Terms
     `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
 - **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
