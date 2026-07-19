@@ -672,7 +672,13 @@ How CueLABS work is executed with an orchestrator + subagents (ratified
   work so any successor can resume from the canvas/tree alone: verify
   `git branch --show-current` before every commit (trees are shared),
   stage explicitly by path, prefer many small commits/calls, use detached
-  worktrees when touching a repo another agent holds. On process
+  worktrees when touching a repo another agent holds. **Branch fresh,
+  land clean** (ratified 2026-07-19): `git fetch origin` immediately
+  before creating any branch (always off the just-fetched
+  `origin/main`), and when a sibling PR merges while yours is open,
+  merge `origin/main` into your branch before the final push —
+  MERGEABLE is part of the merge gate, and conflict resolution follows
+  the current-docs rule. On process
   restarts/session limits: resume from transcript when possible; when a
   transcript is lost or too bloated to resume, spawn a fresh agent with a
   context handoff and verify-then-fix (idempotent) instructions.
