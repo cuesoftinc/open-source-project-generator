@@ -735,6 +735,10 @@ URLs); `<Product>` = display name.
 - **Marketing nav** (same counts everywhere): 4 text links — Features ·
   product slot (same slot as the footer) · Docs (GitBook root) · GitHub —
   plus the ThemeToggle control and the "Sign in" CTA (`/signin`).
+  **Mobile**: below `md` the text links collapse into a menu-button
+  disclosure (hamburger, `aria-expanded`) opening a panel with the same
+  4 links + ThemeToggle + Sign in; no canonical link may be unreachable
+  at any viewport (ratified 2026-07-19 from review finding).
 - **Theme toggle everywhere** — every product ships light/dark switching
   on the marketing nav AND the dashboard chrome (rail/top bar) and in
   settings. Contract = apparule's `src/design/ThemeProvider.tsx`
