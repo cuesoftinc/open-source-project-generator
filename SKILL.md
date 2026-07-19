@@ -604,7 +604,18 @@ How each product's `web/` app is built (ratified 2026-07-18):
   `collisionPadding`/`align`; bespoke layers measure + clamp) — found
   live as a period-picker popover clipping off the right screen edge.
   e2e asserts an edge-anchored layer's boundingBox is inside the
-  viewport at 1440 and 390.
+  viewport at 1440 and 390. **Mobile-width CSS traps (root-caused
+  2026-07-19)**: percentage `max-w-full` is ignored during intrinsic
+  sizing — wide children need `grid-cols-1`/`minmax(0,…)` tracks and
+  `min-w-0` on flex items; `<fieldset>` carries UA
+  `min-inline-size: min-content` (defeats truncation — reset it);
+  same-property Tailwind utilities (`hidden` vs a component's base
+  `inline-flex`) resolve by stylesheet order, not class order — put
+  responsive visibility on WRAPPER elements, never on a component that
+  sets the same property. Wide tables/charts/waterfalls sit in
+  `overflow-x-auto` containers scrolling within the viewport — the
+  document itself never side-scrolls (e2e sweeps every route at 390
+  asserting `scrollWidth <= viewport`).
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   **[Directive 2026-07-19]** legacy paths get NO redirect stubs — once a
@@ -769,6 +780,15 @@ URLs); `<Product>` = display name.
   own spelling).
   - *Legal* (3): Privacy `https://privacy.cuesoft.io` · Terms
     `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
+- **Footer mobile structure (pinned 2026-07-19, reference: upstat
+  MarketingFooter)**: below `md` — brand block full-width first, then
+  the 4 link columns in an orderly 2-column grid, divider, legal bar
+  with the © line first and the utilities (security + language) as ONE
+  grouped cluster wrapping beneath; at `md+` the columns join one row
+  (upstat reference classes: `grid grid-cols-2 gap-8 md:grid-cols-5`
+  with brand `col-span-2 md:col-span-1`; legal bar `flex flex-wrap
+  justify-between`). Each product keeps its visual design; the mobile
+  STACKING structure is parity.
 - **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
   <Product>. CueLABS™ Division. MIT License.` — "Cuesoft Inc." links to
   `https://cuesoft.io`; "CueLABS™ Division" links to
