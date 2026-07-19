@@ -466,6 +466,14 @@ easings, z-index layers (0/10/20/30/40/50), **Lucide** icons, focus ring
 (2px accent, offset 2, :focus-visible). The foundations rows are identical
 across products — changing one is an ecosystem PR touching all three.
 
+**Docs describe the current system** (ratified 2026-07-19): design docs are
+a snapshot of what is on `main` NOW, not a changelog. Decision markers
+(`[Decided …]` / `[Directive …]`) and as-built notes describing the current
+construction stay; archaeology does not — once a replacement lands, clauses
+like "replaces X", "drops Y", "formerly Z", references to retired legacy
+trees, or pointers at Deprecated-page parking are removed in the same pass
+(git history and PRs are the changelog).
+
 ### Figma component-library standard
 
 How each product's Figma library is built (ratified from the
@@ -617,7 +625,11 @@ How each product's `web/` app is built (ratified 2026-07-18):
   build & routing); live paths carry **zero dead code**. Once the
   replacement passes QA + Playwright, the legacy subtree is deleted in a
   dedicated `chore(web): retire legacy <area>` PR. No dead code outside
-  `src/legacy/`, ever; `src/legacy/` itself trends to empty.
+  `src/legacy/`, ever; `src/legacy/` itself trends to empty. The retirement
+  PR also rewrites any docs that referenced the removed content so the docs
+  describe only the current system (the quarantine guardrails — eslint
+  boundary rules + check-boundaries — stay in place to police future
+  quarantines).
 - **Component reuse policy** — pixel-fidelity to the Figma files wins: all
   **visual** components are built in-house from the token layer — no styled
   component kits in new code (no new MUI, no shadcn/DaisyUI skins) and no
