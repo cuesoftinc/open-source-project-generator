@@ -689,6 +689,50 @@ How CueLABS work is executed with an orchestrator + subagents (ratified
   resolved divergence is codified HERE in the same pass (the
   "standardize constantly" rule) so drift becomes a detectable violation.
 
+## Marketing nav, footer & theme parity canon
+
+Ratified 2026-07-19. All products share ONE link inventory — same
+sections, same link counts, same destinations (identical hrefs) — while
+each product renders it in its own visual design. A diverging link set is
+a parity violation. `<product>` = apparule/expendit/upstat (lowercase in
+URLs); `<Product>` = display name.
+
+- **Footer = brand block + 4 columns + legal bar.** Brand block:
+  wordmark + one-line tagline. Columns (links pinned):
+  - *Product* (4): Features · Try Cloud · Self Host · product slot
+    (apparule "For designers" · expendit "Pricing" · upstat
+    "Dashboards") — landing anchors/product routes.
+  - *Docs* (4): Docs `https://cuesoft.gitbook.io/<product>` · Quickstart
+    `…/setup` · API reference `…/system/api-surface` · Self-host guide
+    `…/system/deployment`. (GitBook URL slugs = SUMMARY.md group/page,
+    e.g. `product/roadmap`, `system/deployment`.)
+  - *Community* (4): GitHub `https://github.com/cuesoftinc/<product>` ·
+    Discord `https://discord.gg/CDfZxxrxbb` · Roadmap
+    `https://cuesoft.gitbook.io/<product>/product/roadmap` · CueLABS
+    `https://cuelabs.cuesoft.io`.
+  - *Legal* (3): Privacy `https://privacy.cuesoft.io` · Terms
+    `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
+- **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
+  <Product>. CueLABS™ Division. MIT License.` — "Cuesoft Inc." links to
+  `https://cuesoft.io`; "MIT License" links to
+  `https://github.com/cuesoftinc/<product>/blob/main/LICENSE`. The bar
+  also carries a language selector (English-only for now; ships ahead of
+  i18n by ratified decision 2026-07-19) and a security-policy affordance
+  linking `https://github.com/cuesoftinc/<product>/blob/main/SECURITY.md`
+  — both styled per product design but present everywhere.
+- **Marketing nav** (same counts everywhere): 4 text links — Features ·
+  product slot (same slot as the footer) · Docs (GitBook root) · GitHub —
+  plus the ThemeToggle control and the "Sign in" CTA (`/signin`).
+- **Theme toggle everywhere** — every product ships light/dark switching
+  on the marketing nav AND the dashboard chrome (rail/top bar) and in
+  settings. Contract = apparule's `src/design/ThemeProvider.tsx`
+  replicated: `data-theme` on `<html>`, persisted at localStorage key
+  `<product>.theme`, falling back to the product's design default.
+- **Links are real** — every external href must return HTTP 200
+  (`curl -sIL`) when introduced; Playwright asserts the canonical hrefs
+  on the marketing nav/footer and the theme toggle on both surfaces, so
+  drift fails CI. Figma footer/nav masters carry the same inventory.
+
 ## Recommended versions
 Keep current; last reviewed with the values below.
 
