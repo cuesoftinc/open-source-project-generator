@@ -615,7 +615,12 @@ How each product's `web/` app is built (ratified 2026-07-18):
   sets the same property. Wide tables/charts/waterfalls sit in
   `overflow-x-auto` containers scrolling within the viewport — the
   document itself never side-scrolls (e2e sweeps every route at 390
-  asserting `scrollWidth <= viewport`).
+  asserting `scrollWidth <= viewport`). **Expandable chrome
+  (2026-07-19)**: products with expandable sidebars/rails verify the
+  MAIN CONTENT column in BOTH rail states — no clipped or overflowing
+  charts/tables/grids with the rail expanded, especially at 1024–1440
+  where the expanded rail squeezes the column hardest; the e2e route
+  sweep runs with the rail expanded too.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   **[Directive 2026-07-19]** legacy paths get NO redirect stubs — once a
