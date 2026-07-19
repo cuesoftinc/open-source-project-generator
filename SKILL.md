@@ -780,11 +780,13 @@ URLs); `<Product>` = display name.
   → neutral "Star" with no number — counts are NEVER hardcoded, and
   Figma canvases show the neutral badge) — plus the ThemeToggle control,
   a "Sign in" **text link**, and the "Try Cloud" **primary CTA**
-  (`/signin`). **Mobile**: below `md` the text links collapse into a
-  menu-button disclosure (hamburger, `aria-expanded`) opening a panel
-  with the same 4 links + ThemeToggle + Sign in + Try Cloud; no
-  canonical link may be unreachable at any viewport (ratified 2026-07-19
-  from review finding).
+  (`/signin`). **Mobile**: below `md` the bar keeps the **Try Cloud
+  primary CTA visible beside the hamburger** (user-ratified 2026-07-19
+  from upstat's treatment — the conversion CTA never hides); the text
+  links collapse into a menu-button disclosure (hamburger,
+  `aria-expanded`) opening a panel with the same 4 links + ThemeToggle +
+  Sign in; no canonical link may be unreachable at any viewport
+  (ratified 2026-07-19 from review finding).
 - **Theme toggle everywhere** — every product ships light/dark switching
   on the marketing nav AND the dashboard chrome (rail/top bar) and in
   settings. Contract = apparule's `src/design/ThemeProvider.tsx`
