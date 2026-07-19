@@ -576,6 +576,12 @@ How each product's `web/` app is built (ratified 2026-07-18):
   `/dashboard/logs`); the dev-only component gallery is `/dev/components`
   (excluded from production builds); the mock API mounts at
   `/api/mock/v1/*` mirroring `/api/v1/*` path-for-path.
+- **Canonical naming (uniform across products, [Decided 2026-07-19])** —
+  landing/marketing section components live in `web/src/components/home/`
+  (one module per `pages.md` Part A section); the analytics controller is a
+  hook named **`use-analytics.ts`** exposing the `pages.md` event register
+  behind a TEST_MODE-safe transport seam (events queue inspectably in
+  TEST_MODE; the Upstat beacon is env-gated until D2 ratifies).
 - **TEST_MODE contract** — `NEXT_PUBLIC_TEST_MODE=1` makes
   `GoogleAuthButton` navigate straight to the dashboard (no Firebase) and
   points the API client at the in-app mock server. Auth sits behind an
