@@ -568,6 +568,20 @@ How each product's `web/` app is built (ratified 2026-07-18):
   `clsx`; icons via `lucide-react` + inline brand SVGs. Known deviation:
   upstat's W1 overlays are hand-rolled on Floating UI — converges to Radix
   in its next web stage.
+- **Layout & markup canon (uniform across products, 2026-07-19)** — every
+  marketing/app page constrains content to ONE centered container per the
+  product's design.md §2 layout spec (full-bleed is for band BACKGROUNDS
+  only; section inner content always aligns to the container — measured by
+  rect, not eyeballed). Semantic HTML is required: exactly one `<main>`
+  per page; `nav`/`header`/`footer`/`section`/`aside` landmarks; heading
+  hierarchy; `ul/li` lists; real `table` semantics for tabular data;
+  `button` vs `a` used correctly — div-soup is a review failure. No
+  UNLAYERED element selectors (`main{}`, `button{}`, `svg{}`…) outside
+  `@layer base` — an unlayered `main{min-width:100vw}` shipped a
+  production layout break (min-width beats max-width); element rules live
+  in layers so utilities win. Circular imagery (avatars, story rings) is
+  aspect-locked + cover-cropped (`aspect-square object-cover rounded-full`)
+  at the component level.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   legacy auth paths are quarantined or redirect to `/signin`); every
