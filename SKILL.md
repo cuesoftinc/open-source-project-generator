@@ -802,9 +802,14 @@ URLs); `<Product>` = display name.
     replaced with differentiated real destinations (status page, GitBook
     deep links, roadmap, cuelabs.cuesoft.io).
   - *Docs* (4): Docs `https://cuesoft.gitbook.io/<product>` · Quickstart
-    `…/setup` · API reference `…/system/api-surface` · Self-host guide
+    `…/setup` · API reference `https://<product>.cuesoft.io/docs/api`
+    **[Ratified 2026-07-20]** — the in-app interactive Scalar reference
+    rendered live from the repo's `docs/api/openapi.yaml` (a public
+    `/docs/api` route in every product; the spec stays single-source in
+    `docs/`, served to the embed by a route handler) · Self-host guide
     `…/system/deployment`. (GitBook URL slugs = SUMMARY.md group/page,
-    e.g. `product/roadmap`, `system/deployment`.)
+    e.g. `product/roadmap`, `system/deployment`; GitBook keeps the
+    prose api-surface page.)
   - *Community* (4): GitHub `https://github.com/cuesoftinc/<product>` ·
     Discord `https://discord.gg/CDfZxxrxbb` · Roadmap
     `https://cuesoft.gitbook.io/<product>/product/roadmap` · CueLABS™
