@@ -598,7 +598,13 @@ How each product's `web/` app is built (ratified 2026-07-18):
   explicit rule gives v3 and v4 repos identical behavior. Clickable
   surfaces that aren't real buttons/links are a semantic-HTML violation,
   not a cursor problem.) An e2e asserts the computed cursor on a button
-  and a nav link.
+  and a nav link. **Floating layers collision-clamp (2026-07-19)**:
+  every popover/dropdown/menu/date-picker must stay fully within the
+  viewport at every breakpoint and anchor position (Radix layers get
+  `collisionPadding`/`align`; bespoke layers measure + clamp) — found
+  live as a period-picker popover clipping off the right screen edge.
+  e2e asserts an edge-anchored layer's boundingBox is inside the
+  viewport at 1440 and 390.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   legacy auth paths are quarantined or redirect to `/signin`); every
