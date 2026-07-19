@@ -589,7 +589,16 @@ How each product's `web/` app is built (ratified 2026-07-18):
   production layout break (min-width beats max-width); element rules live
   in layers so utilities win. Circular imagery (avatars, story rings) is
   aspect-locked + cover-cropped (`aspect-square object-cover rounded-full`)
-  at the component level.
+  at the component level. **Cursor affordance (2026-07-19)**: enabled
+  interactive controls show `cursor: pointer` via ONE base-layer rule —
+  `button:not(:disabled), [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled), summary, label[for] { cursor: pointer }` — links
+  rely on the native pointer; disabled controls keep the default cursor.
+  (Tailwind v4 preflight defaults buttons to `cursor: default`; the
+  explicit rule gives v3 and v4 repos identical behavior. Clickable
+  surfaces that aren't real buttons/links are a semantic-HTML violation,
+  not a cursor problem.) An e2e asserts the computed cursor on a button
+  and a nav link.
 - **Canonical routes (uniform across products, 2026-07-18)** — `/` is the
   public home; `/signin` is the ONLY auth route (never `/login`/`/signup`;
   legacy auth paths are quarantined or redirect to `/signin`); every
