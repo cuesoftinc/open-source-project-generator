@@ -744,7 +744,8 @@ URLs); `<Product>` = display name.
     `https://terms.cuesoft.io` · Status `https://status.cuesoft.io`.
 - **Legal bar** (verbatim, name substituted): `© Cuesoft Inc. 2026.
   <Product>. CueLABS™ Division. MIT License.` — "Cuesoft Inc." links to
-  `https://cuesoft.io`; "MIT License" links to
+  `https://cuesoft.io`; "CueLABS™ Division" links to
+  `https://cuelabs.cuesoft.io`; "MIT License" links to
   `https://github.com/cuesoftinc/<product>/blob/main/LICENSE`. The bar
   also carries a language selector (English-only for now; ships ahead of
   i18n by ratified decision 2026-07-19) and a security-policy affordance
