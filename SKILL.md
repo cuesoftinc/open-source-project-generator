@@ -660,10 +660,19 @@ How each product's `web/` app is built (ratified 2026-07-18):
   `/api/mock/v1/*` mirroring `/api/v1/*` path-for-path.
 - **Canonical naming (uniform across products, [Decided 2026-07-19])** —
   landing/marketing section components live in `web/src/components/home/`
-  (one module per `pages.md` Part A section); the analytics controller is a
+  (one module per `pages.md` Part A section); the marketing chrome
+  components are named **`MarketingNav`** / **`MarketingFooter`** in every
+  repo ([Reconciled 2026-07-20] — apparule renamed from HomeNav/HomeFooter
+  for fleet parity); the analytics controller is a
   hook named **`use-analytics.ts`** exposing the `pages.md` event register
   behind a TEST_MODE-safe transport seam (events queue inspectably in
   TEST_MODE; the Upstat beacon is env-gated until D2 ratifies).
+- **Date idiom ([Adjudicated 2026-07-20])** — finance/audit surfaces
+  (expendit dashboards) render ABSOLUTE dates; social/feed surfaces
+  (apparule) render RELATIVE phrasing (`formatAgoPhrase`); telemetry
+  (upstat) renders absolute UTC-derived stamps with `MMM d` for
+  pre-today. Each product's design.md records its idiom — mixed idioms
+  on one surface are a review failure.
 - **TEST_MODE contract** — `NEXT_PUBLIC_TEST_MODE=1` makes
   `GoogleAuthButton` navigate straight to the dashboard (no Firebase) and
   points the API client at the in-app mock server. Auth sits behind an
