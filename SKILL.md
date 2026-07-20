@@ -650,7 +650,21 @@ How each product's `web/` app is built (ratified 2026-07-18):
   stretched/`preserveAspectRatio="none"` SVG the series renders as
   literal dashes with data-hiding gaps. Never combine the two on one
   element; stretched-fill series fade in instead, and e2e pins the
-  stretched polyline dash-free. **Micro-labels**: where a product uses
+  stretched polyline dash-free. **Landing type fidelity (ratified
+  2026-07-20, fleet audit)**: web type binds the product's Figma FAMILY
+  — Inter loads via `next/font` (variable, real 400/600/700), never
+  left to the OS system stack (SF Pro renders visibly heavier and
+  wider; found live as apparule's "font-weight" report — the weight
+  was right, the family wasn't); ramp letter-spacing lives in the
+  theme's text tokens (Title/24 −0.25px, Display/32 −0.5px etc.),
+  never inline per-element. Fleet smoothing pair:
+  `-webkit-font-smoothing: antialiased` +
+  `-moz-osx-font-smoothing: grayscale` (grayscale AA is how Figma
+  rasterizes; `auto` reads heavier than the canvas) — via a globals
+  `body` rule or Tailwind `antialiased` on `<html>`, both blessed.
+  Each home.spec carries a per-role TYPE-CONTRACT e2e (computed
+  family/weight/size/line-height/letter-spacing per landing role).
+  **Micro-labels**: where a product uses
   micro-labels (table headers, footer columns, section headings) they
   are 11px uppercase tracking-wide — masters and build match.
   **Mobile-width CSS traps (root-caused
