@@ -706,6 +706,13 @@ How CueLABS™ work is executed with an orchestrator + subagents (ratified
   a private artifact directory per agent under the session scratchpad
   (parallel agents collide on shared temp names); and a "stop cleanly and
   report — you'll be resumed" escape hatch.
+- **Double-writer protocol** — when two live agent instances discover
+  each other in one worktree (restart-resume races), they partition the
+  mission via an UNTRACKED ledger file (`COORDINATION-<mission>.local.md`:
+  who owns which items, endgame owner), honor it, and delete it before
+  the PR. Field-proven 2026-07-20 (Wave A: twin took items 1–3, resume
+  took 4–6, zero lost work). Never assume a "killed" twin is dead —
+  verify via processes/mtimes before taking over its endgame.
 - **Durable-state-first** — git branches/PRs, Figma files, and docs are
   the real state; agent transcripts are disposable. Agents must design
   work so any successor can resume from the canvas/tree alone: verify
