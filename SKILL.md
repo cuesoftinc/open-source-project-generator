@@ -774,11 +774,20 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `next start` against the prebuilt TEST_MODE app. upstat runs serial
   (`workers: 1`) by design — shared mutable mock narrative.
 - **tsconfig** — byte-identical (route-types entries included).
+- **Tailwind v4 + typed config org-wide [Ratified 2026-07-20]**: all
+  repos run Tailwind v4 (`@tailwindcss/postcss`, tokens via a
+  `@theme inline` block in globals.css over the tokens.css vars — the
+  v3 color-mix alpha workaround is retired; v4 alpha modifiers are
+  native) and a typed `next.config.ts`. husky/lint-staged are gone
+  everywhere. v4-migration gotchas (root-caused, pixel-verified):
+  pin `text-*` line-heights to px where nested font-size scopes
+  inherit; v4's universal reset zeroes UA `td/th` padding (base rule
+  if tables relied on it); `shadow-sm`→`shadow-xs` rename; fractional
+  sizes like `h-4.5` were v3 no-ops but real in v4 (audit icons);
+  responsive visibility lives on wrappers (display-utility CSS order).
 - **Catalogued non-parity (deliberate)**: per-repo `eslint.config.mjs`
   extensions (expendit import bans + testing-library; upstat X-8
-  ignores) · Tailwind v3 (expendit) vs v4 (apparule/upstat) ·
-  `next.config.js` vs `.ts` · expendit-only `lint:staged`. Changing any
-  of these is an ecosystem decision, not repo drift.
+  ignores). Changing these is an ecosystem decision, not repo drift.
 
 ## Marketing nav, footer & theme parity canon
 
