@@ -228,7 +228,6 @@ Remove (safe — not application code):
 
 Never remove:
 - **Application code**, service assets/models, or test fixtures.
-- Any `web/.deprecated/` directory (retained deliberately).
 - Placeholder `.gitkeep`s in genuinely-empty standard dirs (`deploy/*`,
   `mobile/android`, `mobile/ios`, `scripts`).
 
@@ -245,8 +244,8 @@ Never remove:
 5. Create any missing standard dirs (`deploy/{docker,helm,terraform}`, `scripts`)
    with `.gitkeep` placeholders.
 6. Apply the cleanup rules above.
-7. Verify: build/imports intact, `git status` clean, no app code deleted,
-   `.deprecated` preserved. Open a PR (do not self-merge without review).
+7. Verify: build/imports intact, `git status` clean, no app code deleted.
+   Open a PR (do not self-merge without review).
 
 ## Procedure B — bootstrap a new repo
 1. Create the structure above (only the services you actually have).
@@ -339,8 +338,7 @@ flowchart LR
   Playwright e2e specs live in `web/e2e/<flow>.spec.ts` (flow names mirror
   the design.md §8.4 prototype journeys) with `playwright.config.ts` at the
   web root; npm scripts are `test` (unit), `test:e2e` (Playwright), `lint`,
-  `typecheck` in every web app. Legacy `__tests__/` folders survive only
-  inside `src/legacy/`.
+  `typecheck` in every web app.
 - Transactional email: **Brevo REST API** only (`BREVO_API_KEY/FROM_EMAIL/
   FROM_NAME` via Doppler; irealty is the reference) — **no SMTP** in any
   CueLABS™ product.
@@ -553,9 +551,8 @@ apparule/expendit/upstat library builds, 2026-07):
 How each product's `web/` app is built (ratified 2026-07-18):
 
 - **Stack** — Next.js 16 App Router + React 19 + TypeScript; Tailwind
-  utilities map to the token CSS variables. New-system components are
-  token/Tailwind-based everywhere; expendit migrates progressively off MUI,
-  which survives only inside `src/legacy/` until retired.
+  utilities map to the token CSS variables. Components are
+  token/Tailwind-based everywhere.
 - **Design tokens** — `web/src/design/tokens.css` holds CSS custom
   properties mirroring design.md §2 exactly: colors as light `:root` / dark
   `[data-theme="dark"]` (honoring `prefers-color-scheme` with manual
@@ -704,8 +701,7 @@ How each product's `web/` app is built (ratified 2026-07-18):
   landing/marketing section components live in `web/src/components/home/`
   (one module per `pages.md` Part A section); the marketing chrome
   components are named **`MarketingNav`** / **`MarketingFooter`** in every
-  repo ([Reconciled 2026-07-20] — apparule renamed from HomeNav/HomeFooter
-  for fleet parity); the analytics controller is a
+  repo; the analytics controller is a
   hook named **`use-analytics.ts`** exposing the `pages.md` event register
   behind a TEST_MODE-safe transport seam (events queue inspectably in
   TEST_MODE; the Upstat beacon is env-gated until D2 ratifies).
@@ -743,7 +739,8 @@ How each product's `web/` app is built (ratified 2026-07-18):
   build & routing); live paths carry **zero dead code**. Once the
   replacement passes QA + Playwright, the legacy subtree is deleted in a
   dedicated `chore(web): retire legacy <area>` PR. No dead code outside
-  `src/legacy/`, ever; `src/legacy/` itself trends to empty. The retirement
+  `src/legacy/`, ever; no repo currently carries a `src/legacy/` — the
+  quarantine exists for future deprecations only. The retirement
   PR also rewrites any docs that referenced the removed content so the docs
   describe only the current system (the quarantine guardrails — eslint
   boundary rules + check-boundaries — stay in place to police future
@@ -880,10 +877,10 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
 - **tsconfig** — byte-identical (route-types entries included).
 - **Tailwind v4 + typed config org-wide [Ratified 2026-07-20]**: all
   repos run Tailwind v4 (`@tailwindcss/postcss`, tokens via a
-  `@theme inline` block in globals.css over the tokens.css vars — the
-  v3 color-mix alpha workaround is retired; v4 alpha modifiers are
-  native) and a typed `next.config.ts`. husky/lint-staged are gone
-  everywhere. v4-migration gotchas (root-caused, pixel-verified):
+  `@theme inline` block in globals.css over the tokens.css vars; alpha
+  via native v4 modifiers) and a typed `next.config.ts`. No
+  husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  v4 gotchas (root-caused, pixel-verified):
   pin `text-*` line-heights to px where nested font-size scopes
   inherit; v4's universal reset zeroes UA `td/th` padding (base rule
   if tables relied on it); `shadow-sm`→`shadow-xs` rename; fractional
@@ -904,16 +901,15 @@ URLs); `<Product>` = display name.
 - **Footer = brand block + 4 columns + legal bar.** Brand block:
   wordmark + one-line tagline. Columns (links pinned):
   - *Product* (4): Features · Try Cloud · Self Host · product slot
-    (apparule "For designers" · expendit "Pricing" · upstat "Platform"
-    [Revised 2026-07-19 — was "Dashboards", which linked into the
-    auth-gated app; slots are MARKETING anchors, never app routes]) —
-    landing anchors only.
+    (apparule "For designers" · expendit "Pricing" · upstat "Platform";
+    slots are MARKETING anchors, never app routes) — landing anchors
+    only.
   - *Community CTA placement* (2026-07-19): GitHub/Discord conversion
     moments live in exactly three spots — the nav star badge, ONE
     mid-page developers/community section (GitHub + Discord pair), and
-    the footer Community column. Additional bottom-section CTAs are
-    replaced with differentiated real destinations (status page, GitBook
-    deep links, roadmap, cuelabs.cuesoft.io).
+    the footer Community column. Bottom sections use differentiated real
+    destinations (status page, GitBook deep links, roadmap,
+    cuelabs.cuesoft.io) — never extra GitHub/Discord CTAs.
   - *Docs* (4): Docs `https://cuesoft.gitbook.io/<product>` · Quickstart
     `…/setup` · API reference `https://<product>.cuesoft.io/docs/api`
     **[Ratified 2026-07-20]** — the in-app interactive Scalar reference
