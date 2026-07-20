@@ -888,7 +888,12 @@ URLs); `<Product>` = display name.
   system — system tracks `prefers-color-scheme` live (matchMedia
   listener; pre-paint init script covers it, no FOUC); the nav toggle
   cycles the three with distinct icons (sun/moon/monitor); settings
-  offers a three-way control. Embedded surfaces with their own theming
+  offers a three-way control. **Key ABSENT = the product's design
+  default** (apparule light · expendit dark · upstat dark) — the
+  designed first impression is deterministic; "system" is an EXPLICIT
+  choice stored like any preference (never modeled as key-absent).
+  CI runs default to colorScheme light — specs asserting boot themes
+  rely on this contract, not the runner's OS. Embedded surfaces with their own theming
   (e.g. the Scalar /docs/api reference) sync to the RESOLVED theme and
   hide their native toggles.
 - **Links are real** — every external href must return HTTP 200
