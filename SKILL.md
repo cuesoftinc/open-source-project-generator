@@ -604,13 +604,34 @@ How each product's `web/` app is built (ratified 2026-07-18):
   explicit rule gives v3 and v4 repos identical behavior. Clickable
   surfaces that aren't real buttons/links are a semantic-HTML violation,
   not a cursor problem.) An e2e asserts the computed cursor on a button
-  and a nav link. **Floating layers collision-clamp (2026-07-19)**:
-  every popover/dropdown/menu/date-picker must stay fully within the
-  viewport at every breakpoint and anchor position (Radix layers get
-  `collisionPadding`/`align`; bespoke layers measure + clamp) — found
-  live as a period-picker popover clipping off the right screen edge.
-  e2e asserts an edge-anchored layer's boundingBox is inside the
-  viewport at 1440 and 390. **Danger-affordance ladder (ratified
+  and a nav link. **Floating layers collision-clamp (2026-07-19; Y-axis
+  + anatomy 2026-07-20)**: every popover/dropdown/menu/date-picker must
+  stay fully within the viewport at every breakpoint and anchor
+  position, on BOTH axes (Radix layers get `collisionPadding`/`align`;
+  bespoke layers measure + clamp, and FLIP ABOVE the anchor when the
+  space below can't hold them) — found live twice: a period-picker
+  clipping off the right edge, then its calendar extending past the
+  viewport bottom and giving the document a scrollbar. An open layer
+  NEVER creates a page scrollbar. e2e asserts an edge-anchored layer's
+  boundingBox is inside the viewport at 1440 and 390, plus a SHORT
+  viewport (~1440×700) for bottom-anchored pickers. ANATOMY: a new
+  floating panel's internals (padding, section separation, header/grid
+  spacing) are pixel-verified against its Figma master before merge —
+  a picker shipped with a working grid but cramped edge-flush padding
+  because only behavior was checked. GOTCHA (Enter-commit
+  focus-restore): committing a layer's value via Enter must not
+  restore focus to the trigger in a way that immediately reopens the
+  layer — close handlers guard against reopen-on-refocus.
+  **Modal-embedded menus (2026-07-20)**: a Select/dropdown opened
+  INSIDE a Modal/Sheet must not clip against the modal body's overflow
+  into a raw inner scrollbox — menus portal outside the modal's scroll
+  container (or the modal body exempts them from clipping) and render
+  as proper padded height-capped layers; found live as a merge-modal
+  select scrolling "inside the boxy box". **Dashboard mid-band balance
+  (2026-07-20)**: two-column overview bands bottom-align per the frame
+  — flexible plot/list heights with min-height floors absorb the
+  delta; a shorter column never leaves a dead whitespace strip under
+  it (found live under the expendit cash-flow chart). **Danger-affordance ladder (ratified
   2026-07-20)**: destructive row-level actions render as QUIET danger
   text links; filled danger buttons are reserved for armed/confirm
   surfaces; account/data-destroying confirms are TYPED (org-name) with
@@ -789,6 +810,24 @@ How CueLABS™ work is executed with an orchestrator + subagents (ratified
   QA-loop findings for the stage are resolved or adjudicated. Every
   resolved divergence is codified HERE in the same pass (the
   "standardize constantly" rule) so drift becomes a detectable violation.
+- **User-reported findings are CLASSES (ratified 2026-07-20)** — a
+  defect reported live on one product is never closed as a spot fix:
+  before the round ends, every sibling product is swept for the same
+  class (same construction or the analogous surface) and each gets an
+  explicit fix or a recorded clean verdict with evidence. Docs and
+  Figma masters are updated in the same round as the code fix — the
+  three never diverge for longer than one PR cycle.
+- **Checkout & push discipline (field-proven 2026-07-20)** — agent
+  lane work NEVER happens in a repo's main checkout: lanes always use
+  detached worktrees; the main checkout stays on `main` (a lane that
+  left the main checkout on a feature branch with dirty files nearly
+  lost the work to a restart, and holds ports/tools other lanes need).
+  Push after EVERY commit — host restarts are frequent enough that
+  unpushed commits and uncommitted worktree state are the only real
+  data-loss vector we've hit; remotes are the durable state. Before
+  declaring any prior lane's work lost, VERIFY remotes and worktrees
+  first — three "restart, start fresh" resumes in one day turned out
+  to have fully-survived branches.
 
 ## Web tooling parity canon
 
