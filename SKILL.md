@@ -643,7 +643,14 @@ How each product's `web/` app is built (ratified 2026-07-18):
   baseline where mastered; DATA HONESTY: never fabricate points for
   periods before the data exists (trim to onset), discrete observations
   (e.g. two fiscal years) render with point markers, series/domains
-  never lie about granularity. **Micro-labels**: where a product uses
+  never lie about granularity. GOTCHA (root-caused 2026-07-20):
+  `vector-effect: non-scaling-stroke` computes DASH metrics in screen
+  space, so it silently breaks any `pathLength`-normalized
+  `stroke-dasharray` trick (e.g. dash draw-in animations) — on a
+  stretched/`preserveAspectRatio="none"` SVG the series renders as
+  literal dashes with data-hiding gaps. Never combine the two on one
+  element; stretched-fill series fade in instead, and e2e pins the
+  stretched polyline dash-free. **Micro-labels**: where a product uses
   micro-labels (table headers, footer columns, section headings) they
   are 11px uppercase tracking-wide — masters and build match.
   **Mobile-width CSS traps (root-caused
