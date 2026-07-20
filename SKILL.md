@@ -87,8 +87,9 @@ by accident — when adopting them, copy `templates/gitignore` → `.gitignore`,
 lists one `updates` entry per real manifest directory (`gomod /api/common`,
 `pip /api/<python-service>`, `npm /web`, `pub /mobile/flutter`), grouped per
 ecosystem, and **must not** point at dead/deprecated directories. It has **no**
-`github-actions` entry — this standard uses no CI workflows, so that updater
-would fail with "no workflows found".
+`github-actions` entry — the CI workflows (`build-and-test.yml` +
+tag-gated `release.yml`) are org canon kept BYTE-IDENTICAL across repos
+and updated deliberately in canon passes, never by a per-repo bot.
 
 ## Service structure (production)
 When bootstrapping or standardizing a service, **migrate existing code into
@@ -501,7 +502,12 @@ apparule/expendit/upstat library builds, 2026-07):
   opacity (Figma drops paint-level opacity on variable-bound instance
   fills); component descriptions carry the MI/motion notes and **[Decided]**
   mappings that apply to them; OpenType tabular figures (`tnum`) must be
-  toggled manually — the plugin API cannot set font features.
+  toggled manually — the plugin API cannot set font features. Two more
+  API gotchas [2026-07-20]: the `description` write path HTML-escapes
+  quotes/angle-brackets/ampersands at storage (write entity-safe —
+  typographic quotes, no `<` or `&`), and page enumeration must use a
+  read-only `figma.root.children` call (the no-nodeId listing returns
+  only loaded pages).
 - **Content** — photography must be licensed, with attributions rendered on
   the Assets page; screens assemble from component instances **only**.
 - **Canvas hygiene** — design canvases carry **product copy only**; spec
@@ -604,7 +610,22 @@ How each product's `web/` app is built (ratified 2026-07-18):
   `collisionPadding`/`align`; bespoke layers measure + clamp) — found
   live as a period-picker popover clipping off the right screen edge.
   e2e asserts an edge-anchored layer's boundingBox is inside the
-  viewport at 1440 and 390. **Mobile-width CSS traps (root-caused
+  viewport at 1440 and 390. **Danger-affordance ladder (ratified
+  2026-07-20)**: destructive row-level actions render as QUIET danger
+  text links; filled danger buttons are reserved for armed/confirm
+  surfaces; account/data-destroying confirms are TYPED (org-name) with
+  an "Export everything first" escape hatch and grace-period semantics
+  where ratified. **Chart construction (ratified 2026-07-20)**: bespoke
+  charts follow their Figma master's axis construction — dedicated
+  y-axis column with a nice-scale tick ladder (1/2/2.5/5×10^k),
+  unit/currency-aware compact labels, token-bound gridlines, zero
+  baseline where mastered; DATA HONESTY: never fabricate points for
+  periods before the data exists (trim to onset), discrete observations
+  (e.g. two fiscal years) render with point markers, series/domains
+  never lie about granularity. **Micro-labels**: where a product uses
+  micro-labels (table headers, footer columns, section headings) they
+  are 11px uppercase tracking-wide — masters and build match.
+  **Mobile-width CSS traps (root-caused
   2026-07-19)**: percentage `max-w-full` is ignored during intrinsic
   sizing — wide children need `grid-cols-1`/`minmax(0,…)` tracks and
   `min-w-0` on flex items; `<fieldset>` carries UA
@@ -867,10 +888,11 @@ URLs); `<Product>` = display name.
 - **Marketing nav** (same composition everywhere, [Revised 2026-07-19]):
   4 text links — Features · product slot (same slot as the footer) · Docs
   (GitBook root) · GitHub, where the GitHub item renders as a compact
-  **star badge** (star glyph + "Star" + live count fetched client-side
-  from the repo's `stargazers_count`, cached; TEST_MODE or fetch failure
-  → neutral "Star" with no number — counts are NEVER hardcoded, and
-  Figma canvases show the neutral badge) — plus the ThemeToggle control,
+  **star badge** — fleet construction [Reconciled 2026-07-20]:
+  GitHubMark(14) + star glyph(12) + "Star" label + live count fetched
+  client-side from the repo's `stargazers_count`, cached; TEST_MODE or
+  fetch failure → neutral "Star" with no number — counts are NEVER
+  hardcoded, and Figma canvases show the neutral badge) — plus the ThemeToggle control,
   a "Sign in" **text link**, and the "Try Cloud" **primary CTA**
   (`/signin`). **Mobile**: below `md` the bar keeps the **Try Cloud
   primary CTA visible beside the hamburger** (user-ratified 2026-07-19
