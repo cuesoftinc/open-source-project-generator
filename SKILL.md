@@ -667,6 +667,13 @@ How each product's `web/` app is built (ratified 2026-07-18):
   hook named **`use-analytics.ts`** exposing the `pages.md` event register
   behind a TEST_MODE-safe transport seam (events queue inspectably in
   TEST_MODE; the Upstat beacon is env-gated until D2 ratifies).
+- **Settings IA ([Ratified 2026-07-20])** — expendit + upstat settings
+  are ROUTE-BACKED TABS: a settings-local tab bar where every tab is a
+  real sub-route (`/dashboard/settings/<tab>`, deep-linkable; bare
+  `/dashboard/settings` redirects to the first tab — a live-IA
+  redirect, not a legacy stub); apparule keeps its hub with sub-screen
+  rows (deliberate per-product shape — a designed decision, not
+  drift).
 - **Date idiom ([Adjudicated 2026-07-20])** — finance/audit surfaces
   (expendit dashboards) render ABSOLUTE dates; social/feed surfaces
   (apparule) render RELATIVE phrasing (`formatAgoPhrase`); telemetry
