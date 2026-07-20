@@ -872,11 +872,18 @@ URLs); `<Product>` = display name.
   `aria-expanded`) opening a panel with the same 4 links + ThemeToggle +
   Sign in; no canonical link may be unreachable at any viewport
   (ratified 2026-07-19 from review finding).
-- **Theme toggle everywhere** — every product ships light/dark switching
+- **Theme toggle everywhere** — every product ships theme switching
   on the marketing nav AND the dashboard chrome (rail/top bar) and in
   settings. Contract = apparule's `src/design/ThemeProvider.tsx`
   replicated: `data-theme` on `<html>`, persisted at localStorage key
   `<product>.theme`, falling back to the product's design default.
+  **[Revised 2026-07-20]** the contract is TRI-STATE: light | dark |
+  system — system tracks `prefers-color-scheme` live (matchMedia
+  listener; pre-paint init script covers it, no FOUC); the nav toggle
+  cycles the three with distinct icons (sun/moon/monitor); settings
+  offers a three-way control. Embedded surfaces with their own theming
+  (e.g. the Scalar /docs/api reference) sync to the RESOLVED theme and
+  hide their native toggles.
 - **Links are real** — every external href must return HTTP 200
   (`curl -sIL`) when introduced; Playwright asserts the canonical hrefs
   on the marketing nav/footer and the theme toggle on both surfaces, so
