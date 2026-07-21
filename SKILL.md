@@ -890,6 +890,18 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `@theme inline` block in globals.css over the tokens.css vars; alpha
   via native v4 modifiers) and a typed `next.config.ts`. No
   husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  **Overlay focus contract (ratified 2026-07-21, fleet)**: every
+  Sheet/Modal/Dialog/palette captures its opener on open and restores
+  focus to it on close (Radix controlled dialogs with a null triggerRef
+  restore to BODY — capture in `onOpenAutoFocus`, restore in
+  `onCloseAutoFocus`); Escape dismisses from ANY focused element inside
+  (bind on the dialog container, never an inner input); dialogs carry
+  `aria-modal`. e2e probe shape per repo: open → Tab inside → Escape
+  closes → focus is back on the trigger. **Named-control API
+  (ratified 2026-07-21)**: selection/icon-only controls make the
+  accessible name COMPILE-MANDATORY (union prop: visible `label` OR
+  `aria-label` — expendit `Checkbox` is the reference); axe e2e gates
+  pin zero criticals on the densest table surface per product.
   **Firebase App Hosting image gotcha (root-caused 2026-07-21)**: the
   FAH Next adapter injects `images.unoptimized = true` at deploy build
   unless `images.loader`/`unoptimized` is explicitly set — `next/image`
