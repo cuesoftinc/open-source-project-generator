@@ -1154,6 +1154,72 @@ URLs); `<Product>` = display name.
   that ship 404s — point them at the real GitBook pages (found live
   2026-07-19 as a dead "Self-host docs" link).
 
+## Mobile (Flutter) implementation standard
+
+Ratified 2026-07-21 (apparule is the first and only mobile product; web-
+research-verified against July-2026 sources). The product's docs/
+mobile-implementation.md carries the full contract; this section is the
+org canon.
+
+- **Toolchain**: current stable Flutter pinned via FVM — `.fvmrc` is the
+  single source of truth (CI reads it), mirrored as a hard
+  `environment: flutter:` pin in pubspec. At ratification: Flutter
+  3.44.7 / Dart 3.12 (Android floor API 24, iOS 13; SwiftPM is the iOS
+  dependency default — CocoaPods registry goes read-only 2026-12).
+- **Architecture**: the official Flutter MVVM + Repository vocabulary
+  (Views ↔ 1:1 ViewModels; abstract repositories are the single source
+  of truth and never reference each other; services are stateless
+  single-source wrappers; unidirectional flow; immutable models;
+  use-cases only when EARNED, in `<feature>/domain/`). Organization is
+  FEATURE-FIRST: `lib/src/features/<feature>/{presentation,domain,data}`
+  + `src/{app,routing,core}` — core/ui is the design system.
+- **State/DI**: Riverpod 3 with codegen (`@riverpod` ViewModels,
+  ConsumerWidgets; riverpod_lint via custom_lint). DI = Riverpod
+  provider overrides per environment — no second DI container.
+- **Navigation**: go_router + go_router_builder typed routes
+  (accepted in maintenance mode — first-party; revisit on a successor);
+  StatefulShellRoute for the tab shell; one top-level auth `redirect`
+  off the session provider.
+- **Data**: one configured Dio in core/data; per-feature `*ApiService`;
+  freezed domain models, json_serializable API models (separate —
+  the Go API drifts from UI shapes). Codegen output (`.g.dart`,
+  `.freezed.dart`) is COMMITTED with a CI codegen-fresh check;
+  generated l10n is gitignored (regenerates on pub get).
+- **MOCK-FIRST (TEST_MODE parity)**: every repository is abstract with
+  `*Remote` and `*Fake` implementations; fakes read seeded narrative
+  JSON from dev-flavor-scoped `assets/seed/`; per-flavor entrypoints
+  (`main_dev/stg/main.dart`) pick the provider-override set. API wiring
+  lands LAST behind unchanged repository interfaces.
+- **Design system**: Material 3 + one ThemeExtension per token group,
+  GENERATED from the product's Figma variables (tokens JSON in-repo is
+  the reviewed artifact; Dart output never hand-edited); light+dark
+  from the same token set; fonts bundled (no runtime fetching). One
+  module per Figma component set, constructor params mirror the
+  variant axes (the web component canon carried over) — each set
+  golden-tested.
+- **Quality**: very_good_analysis (+ riverpod_lint), strict casts/
+  inference/raw-types; tests mirror lib/src (unit = ViewModels/repos/
+  services with mocktail + ProviderContainer overrides; widget = every
+  screen over fakes; golden = alchemist — golden_toolkit is
+  discontinued; E2E = patrol smoke journeys, nightly not per-PR).
+  CI: format check, codegen-fresh, analyze --fatal-infos + custom_lint,
+  test --coverage with a gate, apk/ipa build matrix on main.
+- **Hygiene**: flavors dev/stg/prd (applicationIdSuffix + iOS schemes,
+  `appFlavor` constant, flavor-scoped assets); secrets via
+  `--dart-define-from-file=env/<flavor>.json` generated from Doppler,
+  gitignored — never envied/obfuscation as security; gen-l10n with
+  `synthetic-package: false` (flutter_gen removed in current Flutter);
+  native projects live INSIDE the flutter root; icons/splash via
+  flutter_launcher_icons + flutter_native_splash per flavor;
+  `version: x.y.z+build` — humans own x.y.z, CI stamps build number.
+- **Auth (X-1 carried to mobile)**: Google sign-in ONLY via Firebase —
+  `flutterfire configure` per flavor against sandbox-e306a;
+  google_sign_in 7.x flow (`GoogleSignIn.instance.initialize` →
+  `authenticate()` → `signInWithCredential`; silent restore via
+  `attemptLightweightAuthentication()`); tokens at rest in
+  flutter_secure_storage; wrapped in an abstract auth_repository with
+  a fake for TEST_MODE. Password/SMS/OTP flows are forbidden.
+
 ## Recommended versions
 Keep current; last reviewed with the values below.
 
