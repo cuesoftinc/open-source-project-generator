@@ -925,6 +925,19 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   nav rail's Link prefetch converges every dashboard route to one
   chunk union (navigation latency traded for lab bytes), and the
   framework floor is ~107K encoded.
+  **Layout-stability canon (ratified 2026-07-21, fleet)**: CLS's
+  dominant cause is client-persisted layout state resolving
+  post-paint — any state that changes GEOMETRY (nav rail width,
+  sidebar collapse, density) resolves PRE-PAINT via a root-layout
+  init script setting a `data-*` attr on `<html>` (the theme-script
+  pattern), with CSS binding the geometry to a var; the React store
+  hydrates from the same source (`useSyncExternalStore`). Async
+  widgets reserve their rendered size via `--widget-h-*` tokens +
+  `Skeleton kind="frame"`; shell-level banners reserve their slot.
+  Below-the-fold demo panels mount IO-gated (`DeferredPanel`:
+  intersection + startTransition + height-reserving placeholder).
+  Lock: session-windowed CLS probe e2e (< 0.1) on home + the densest
+  dashboards, run against the TEST_MODE prod build.
   **Legal-link canon (ratified 2026-07-21, fleet)**: Terms =
   `https://terms.cuesoft.io`, Privacy = `https://privacy.cuesoft.io` —
   the ONLY legal-link targets (always https; never local `/terms` or
