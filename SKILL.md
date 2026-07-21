@@ -586,9 +586,11 @@ How each product's `web/` app is built (ratified 2026-07-18):
   dialog, popover, select, switch, tooltip, tabs, checkbox, radio,
   accordion); positioning-only cases may use Floating UI; the date library
   is **date-fns** (never dayjs/moment in new code); class composition via
-  `clsx`; icons via `lucide-react` + inline brand SVGs. Known deviation:
-  upstat's W1 overlays are hand-rolled on Floating UI — converges to Radix
-  in its next web stage.
+  `clsx`; icons via `lucide-react` + inline brand SVGs. Upstat converged
+  (2026-07-21): all behavior-bearing overlays ride Radix; its remaining
+  bespoke layers (TimePicker responsive dual-render panel, QueryBar
+  combobox listbox) are positioning-/layout-class per the floating-layers
+  measure-and-clamp clause, recorded in its web-implementation.md.
 - **Layout & markup canon (uniform across products, 2026-07-19)** — every
   marketing/app page constrains content to ONE centered container per the
   product's design.md §2 layout spec (full-bleed is for band BACKGROUNDS
@@ -921,10 +923,13 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   alone still downloads right after hydration. Page chrome stays
   SSR'd. `docs-api-payload.spec.ts` (byte-identical fleet file) locks
   the settled pre-intent JS per product and that intent still mounts
-  the full embed. Related bundle truths (documented, by design): the
-  nav rail's Link prefetch converges every dashboard route to one
-  chunk union (navigation latency traded for lab bytes), and the
-  framework floor is ~107K encoded.
+  the full embed. Related bundle truths: the framework floor is ~107K
+  encoded, and nav-rail prefetch is INTENT-BASED (ratified 2026-07-21,
+  expendit reference: `prefetch={false}` + `router.prefetch` on first
+  pointerenter/focus per item) — viewport-prefetching every pillar
+  converged all dashboard routes to one ~350K chunk union; intent
+  prefetch keeps cold routes at their own chunk set (−42% settled JS)
+  while hover/focus still fires the fetch before click completes.
   **Changelog discipline (ratified 2026-07-21)**: Keep a Changelog
   strictly — ONE `### <Bucket>` heading per bucket per section, in
   canonical order (Added, Changed, Deprecated, Removed, Fixed,
@@ -964,7 +969,10 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   Below-the-fold demo panels mount IO-gated (`DeferredPanel`:
   intersection + startTransition + height-reserving placeholder).
   Lock: session-windowed CLS probe e2e (< 0.1) on home + the densest
-  dashboards, run against the TEST_MODE prod build.
+  dashboards, run against the TEST_MODE prod build. Anything that
+  MOVES per-frame (crosshair tooltips, hover followers) positions via
+  `transform`, never `left`/`top` — layout-property movers are CLS
+  sources (upstat home 0.0108→0.0001 from one tooltip).
   **Legal-link canon (ratified 2026-07-21, fleet)**: Terms =
   `https://terms.cuesoft.io`, Privacy = `https://privacy.cuesoft.io` —
   the ONLY legal-link targets (always https; never local `/terms` or
@@ -998,7 +1006,11 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   and REAL brand icons (favicon.ico multi-size + apple-icon 180 —
   the create-next-app stock Vercel favicon shipped on two products
   for two months; the shared e2e pins each product's favicon hash ≠
-  siblings'). `web/e2e/seo.spec.ts` and
+  siblings'), plus `app/manifest.ts` (served /manifest.webmanifest:
+  product name/short_name, token theme/background colors, the icon
+  set — the shared spec asserts it's linked, resolves, names the
+  product, and every icon 200s). `web/e2e/seo.spec.ts`,
+  `web/components/ui/SkipLink.tsx` (sha-verified across products), and
   `web/scripts/generate-brand-assets.mjs` join the byte-identical
   shared-files list (config keyed by package name).
   **Overlay focus contract (ratified 2026-07-21, fleet)**: every
