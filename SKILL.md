@@ -1212,6 +1212,13 @@ org canon.
   native projects live INSIDE the flutter root; icons/splash via
   flutter_launcher_icons + flutter_native_splash per flavor;
   `version: x.y.z+build` — humans own x.y.z, CI stamps build number.
+- **Legacy quarantine (user directive 2026-07-21, carried from web)**:
+  superseded mobile code is NEVER deleted up front — it moves
+  structure-preserved into `lib/legacy/` (assets to `assets/legacy/`,
+  replaced native trees to `legacy/<name>/`), excluded from pubspec
+  assets, analysis, CI scope, and builds; actual removal requires BOTH
+  the shipped replacement AND an explicit user removal go (web's
+  route-by-route replacement + authorized end-of-program sweeps).
 - **Auth (X-1 carried to mobile)**: Google sign-in ONLY via Firebase —
   `flutterfire configure` per flavor against sandbox-e306a;
   google_sign_in 7.x flow (`GoogleSignIn.instance.initialize` →
