@@ -571,6 +571,16 @@ How each product's `web/` app is built (ratified 2026-07-18):
   (feature-scoped hooks/orchestration that own all state); views =
   `src/app/**` routes + composed components, render-only. **Views never
   fetch.**
+- **Canonical `web/src/` tree (ratified 2026-07-21)** — exactly:
+  `app, auth, components, config, controllers, design, generated, lib,
+  mocks, models` (+ documented product-specific dirs, e.g. upstat
+  `proto/`). `mocks` is PLURAL; auth providers/context live in
+  `src/auth/` (not under controllers); env access goes through
+  `config/env.ts` typed accessors only; shared utils in `lib/`;
+  **no top-level modules in `src/`**. Tree SHAPE is a parity item:
+  standardization sweeps diff the directory trees across repos, not
+  just file contents/tooling — three shape drifts survived two months
+  because sweeps only compared contents (user-flagged 2026-07-21).
 - **Canonical libraries (uniform across products, 2026-07-18)** —
   interactive/behavior primitives use **Radix UI** (`@radix-ui/react-*`:
   dialog, popover, select, switch, tooltip, tabs, checkbox, radio,
