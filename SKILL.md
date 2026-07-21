@@ -1174,8 +1174,18 @@ org canon.
   FEATURE-FIRST: `lib/src/features/<feature>/{presentation,domain,data}`
   + `src/{app,routing,core}` — core/ui is the design system.
 - **State/DI**: Riverpod 3 with codegen (`@riverpod` ViewModels,
-  ConsumerWidgets; riverpod_lint via custom_lint). DI = Riverpod
-  provider overrides per environment — no second DI container.
+  ConsumerWidgets; riverpod_lint 3.x is a NATIVE analyzer plugin —
+  installed via analysis_options `plugins:`, diagnostics in plain
+  `flutter analyze`; custom_lint is retired for it and cannot
+  co-resolve with the modern codegen stack). DI = Riverpod provider
+  overrides per environment — no second DI container. Pin notes
+  (resolver-verified 2026-07-22): build_runner ≤2.15.1 with
+  riverpod_generator 4.0.4; freezed rides its analyzer-12 compat
+  release; intl pins exactly to the SDK's flutter_localizations;
+  gen-l10n's `synthetic-package` key is removed upstream;
+  go_router_builder 4.4 mixes in PUBLIC `$Route` mixins; AGP 9
+  defaults `buildFeatures.resValues` OFF (enable before flavor
+  resValue use).
 - **Navigation**: go_router + go_router_builder typed routes
   (accepted in maintenance mode — first-party; revisit on a successor);
   StatefulShellRoute for the tab shell; one top-level auth `redirect`
