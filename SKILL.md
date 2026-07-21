@@ -900,6 +900,19 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `@theme inline` block in globals.css over the tokens.css vars; alpha
   via native v4 modifiers) and a typed `next.config.ts`. No
   husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  **Heavy-embed intent gate (ratified 2026-07-21, fleet)**: heavyweight
+  third-party embeds (the Scalar API reference is the archetype) load
+  behind a `next/dynamic ssr:false` boundary whose SSR placeholder
+  RESERVES the embed's viewport slice (no CLS), and the import itself
+  is gated on USER INTENT (first pointer/key/wheel gesture, plus an
+  explicit load button for the SR virtual-cursor path) — `ssr:false`
+  alone still downloads right after hydration. Page chrome stays
+  SSR'd. `docs-api-payload.spec.ts` (byte-identical fleet file) locks
+  the settled pre-intent JS per product and that intent still mounts
+  the full embed. Related bundle truths (documented, by design): the
+  nav rail's Link prefetch converges every dashboard route to one
+  chunk union (navigation latency traded for lab bytes), and the
+  framework floor is ~107K encoded.
   **Contrast-token canon (ratified 2026-07-21, fleet)**: the
   tinted-chip recipe (`text-X on bg-X/14`) fails AA in light theme for
   mid-lightness hues — every hue used AS TEXT on its own tint ships a
