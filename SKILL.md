@@ -890,6 +890,18 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `@theme inline` block in globals.css over the tokens.css vars; alpha
   via native v4 modifiers) and a typed `next.config.ts`. No
   husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  **SEO plumbing canon (ratified 2026-07-21, fleet)**: every product
+  ships `app/sitemap.ts` (public routes only — never dashboard/auth),
+  `app/robots.ts` (disallow /dashboard + /api, sitemap ref),
+  `metadataBase` + `alternates.canonical: "./"` in the ROOT layout
+  (the "./" form resolves per-route — verified in dev and prod),
+  a 1200×630 `opengraph-image` card + twitter summary_large_image,
+  and REAL brand icons (favicon.ico multi-size + apple-icon 180 —
+  the create-next-app stock Vercel favicon shipped on two products
+  for two months; the shared e2e pins each product's favicon hash ≠
+  siblings'). `web/e2e/seo.spec.ts` and
+  `web/scripts/generate-brand-assets.mjs` join the byte-identical
+  shared-files list (config keyed by package name).
   **Overlay focus contract (ratified 2026-07-21, fleet)**: every
   Sheet/Modal/Dialog/palette captures its opener on open and restores
   focus to it on close (Radix controlled dialogs with a null triggerRef
