@@ -925,6 +925,25 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   nav rail's Link prefetch converges every dashboard route to one
   chunk union (navigation latency traded for lab bytes), and the
   framework floor is ~107K encoded.
+  **A11y closeout canons (ratified 2026-07-21, fleet)**: (1) every
+  route ships a skip-to-content link — `components/ui/SkipLink.tsx`,
+  first focusable in the root layout/shell, `href="#main"`, hidden
+  until focus, token-only construction; every `<main>` carries
+  `id="main"` + `tabIndex={-1}`; e2e: first Tab on a fresh load lands
+  on it, activation moves focus to main. (2) Decorative interactive
+  mocks set the REAL `inert` attribute (React 19 boolean prop) —
+  `aria-hidden` + `pointer-events-none` alone leaves focusables in
+  the tab order. (3) Radix Tabs (and any aria-controls consumer)
+  never derive `value` from display labels — slugified stable ids
+  (spaces make invalid IDREFs, an axe critical). (4) Command palette
+  opens on ⌘K/Ctrl+K wherever a palette exists (product-specific
+  aliases like upstat's "/" may coexist; products without a palette
+  are per-product scope, not drift). (5) TEST_MODE session state:
+  sessionStorage, key `<product>.test-session`. (6) Landmarks with
+  the same role carry DISTINCT labels (two navs both "Primary"/
+  "Marketing" fail landmark-unique; suffix the variant: "Primary,
+  compact", "Marketing, sticky"). Axe home gates lock the regression
+  families per repo (IDREF/name/table/landmark rules at any impact).
   **Layout-stability canon (ratified 2026-07-21, fleet)**: CLS's
   dominant cause is client-persisted layout state resolving
   post-paint — any state that changes GEOMETRY (nav rail width,
