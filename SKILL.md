@@ -633,7 +633,10 @@ How each product's `web/` app is built (ratified 2026-07-18):
   text links; filled danger buttons are reserved for armed/confirm
   surfaces; account/data-destroying confirms are TYPED (org-name) with
   an "Export everything first" escape hatch and grace-period semantics
-  where ratified. **Chart construction (ratified 2026-07-20)**: bespoke
+  where ratified. Reference implementation: expendit `Button`
+  `kind="quiet-danger"` (danger text on quiet chrome — the canvas
+  "Button (quiet-danger)" instances); products without the kind add it
+  before shipping a row-level destructive action. **Chart construction (ratified 2026-07-20)**: bespoke
   charts follow their Figma master's axis construction — dedicated
   y-axis column with a nice-scale tick ladder (1/2/2.5/5×10^k),
   unit/currency-aware compact labels, token-bound gridlines, zero
