@@ -900,6 +900,18 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `@theme inline` block in globals.css over the tokens.css vars; alpha
   via native v4 modifiers) and a typed `next.config.ts`. No
   husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  **Pre-paint persisted-chrome init (ratified 2026-07-21)**: ANY
+  persisted layout-affecting chrome state (rail expansion, theme,
+  density) resolves in a pre-paint init script in the root layout —
+  the themeInitScript pattern — never post-hydration (upstat's rail
+  animating 56→240px after hydrate was 0.3–0.5 CLS on every
+  dashboard route); skeletons reserve their loaded heights. React 19
+  hydration truths (verified empirically): the lazy-hydration
+  dangerouslySetInnerHTML skip silently NUKES mismatched server DOM,
+  and dehydrated Suspense boundaries are discarded if a parent
+  re-render reaches them — deferred-hydration wrappers must not
+  re-render, must keep band elements identity-stable, and bands own
+  their own state swaps (upstat Defer.tsx documents the contract).
   **Heavy-embed intent gate (ratified 2026-07-21, fleet)**: heavyweight
   third-party embeds (the Scalar API reference is the archetype) load
   behind a `next/dynamic ssr:false` boundary whose SSR placeholder
