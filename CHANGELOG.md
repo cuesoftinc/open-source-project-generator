@@ -42,6 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` deferral-sweep updates (2026-07-21): upstat's Floating-UI
+  deviation retired (converged to Radix; bespoke layers recorded), nav-rail
+  prefetch canon revised to intent-based (hover/focus `router.prefetch`),
+  web manifest + `SkipLink.tsx` join the SEO canon and byte-identical
+  shared-files list, transform-only rule for per-frame movers joins the
+  layout-stability canon, and changelog discipline (single bucket headings,
+  merged top-ups).
+
 - `SKILL.md`: retired-system references scrubbed to current-system voice
   throughout (#103).
 
