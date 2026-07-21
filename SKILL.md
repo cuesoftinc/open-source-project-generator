@@ -890,6 +890,15 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `@theme inline` block in globals.css over the tokens.css vars; alpha
   via native v4 modifiers) and a typed `next.config.ts`. No
   husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  **Firebase App Hosting image gotcha (root-caused 2026-07-21)**: the
+  FAH Next adapter injects `images.unoptimized = true` at deploy build
+  unless `images.loader`/`unoptimized` is explicitly set — `next/image`
+  silently serves raw originals live (no srcset, `/_next/image` 404s).
+  Products with raster imagery ship pre-generated WebP width buckets +
+  a custom loader (apparule `demo-image-loader.ts` is the reference);
+  an e2e pins every demo img to a sized-WebP srcset and the LCP
+  candidate to `fetchpriority=high` (Next 16: `priority` alone no
+  longer emits the hint), never lazy.
   v4 gotchas (root-caused, pixel-verified):
   pin `text-*` line-heights to px where nested font-size scopes
   inherit; v4's universal reset zeroes UA `td/th` padding (base rule
