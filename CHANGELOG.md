@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md`: Mobile (Flutter) implementation standard — FVM-pinned toolchain,
+  official MVVM+Repository vocabulary over a feature-first tree, Riverpod 3,
+  typed go_router, mock-first fake repositories with seeded assets (TEST_MODE
+  parity), Figma-variable-generated ThemeExtensions, one module per Figma
+  component set, very_good_analysis + alchemist/patrol testing, dev/stg/prd
+  flavors with Doppler-fed dart-defines, and the Google-only Firebase auth
+  flow (#120).
+
 - `SKILL.md` web-canon sections from the 2026-07-20/21 program waves: tri-state
   theme contract (#94), double-writer coordination-ledger protocol (#95),
   unset-theme-is-design-default ruling (#96), audit-convergence sync — danger
