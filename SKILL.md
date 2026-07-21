@@ -890,6 +890,20 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   `@theme inline` block in globals.css over the tokens.css vars; alpha
   via native v4 modifiers) and a typed `next.config.ts`. No
   husky/lint-staged anywhere — formatting and lint are CI-enforced.
+  **Contrast-token canon (ratified 2026-07-21, fleet)**: the
+  tinted-chip recipe (`text-X on bg-X/14`) fails AA in light theme for
+  mid-lightness hues — every hue used AS TEXT on its own tint ships a
+  paired `--<hue>-text` variant (OKLCH: darken L only until ≥4.5:1 on
+  the tint composited over the worst surface; base hue stays for
+  fills, borders, icons ≥3:1, and AA-large stats). White-on-critical
+  text uses an explicit `--on-crit` token, never raw #FFFFFF
+  (brand-mandated surfaces exempt). Fixed-light locales (gradient CTA
+  bands, public status pages) pin `data-theme="light"` in code and the
+  Light mode on the canvas frame. Lock shape: an e2e recomputing every
+  recipe pair from the SERVED CSS in both themes asserting ≥4.5:1,
+  plus a rendered sweep with walk-up backdrop compositing on the
+  densest chip surface. Figma carries the same `-text` variables
+  (same collection, both modes) bound to chip/pill/nav text fills.
   **SEO plumbing canon (ratified 2026-07-21, fleet)**: every product
   ships `app/sitemap.ts` (public routes only — never dashboard/auth),
   `app/robots.ts` (disallow /dashboard + /api, sitemap ref),
