@@ -50,6 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` mobile standard: legacy-quarantine rule — superseded code moves
+  to `lib/legacy/` and is removed only after its replacement ships with an
+  explicit user go (#121).
+
 - `SKILL.md` deferral-sweep updates (2026-07-21): upstat's Floating-UI
   deviation retired (converged to Radix; bespoke layers recorded), nav-rail
   prefetch canon revised to intent-based (hover/focus `router.prefetch`),
