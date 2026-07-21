@@ -848,7 +848,14 @@ How CueLABS™ work is executed with an orchestrator + subagents (ratified
   data-loss vector we've hit; remotes are the durable state. Before
   declaring any prior lane's work lost, VERIFY remotes and worktrees
   first — three "restart, start fresh" resumes in one day turned out
-  to have fully-survived branches.
+  to have fully-survived branches. **Worktree removal is part of the
+  merge gate (user directive 2026-07-21)**: when a lane's PR merges,
+  its worktree is removed in the same step — never left for a later
+  sweep (accumulated worktrees with node_modules/.next filled the
+  host's disk to zero twice; a forgotten worktree also hid an
+  unmerged docs commit for a day). Heavy lanes also cap CONCURRENT
+  build worktrees at two fleet-wide — each npm ci + next build costs
+  ~2GB of disk and enough memory to crash the host.
 
 ## Web tooling parity canon
 
