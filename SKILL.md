@@ -913,6 +913,16 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   nav rail's Link prefetch converges every dashboard route to one
   chunk union (navigation latency traded for lab bytes), and the
   framework floor is ~107K encoded.
+  **Legal-link canon (ratified 2026-07-21, fleet)**: Terms =
+  `https://terms.cuesoft.io`, Privacy = `https://privacy.cuesoft.io` —
+  the ONLY legal-link targets (always https; never local `/terms` or
+  `/privacy` routes — two products shipped dead or `/` placeholder
+  hrefs on signin for two months). Signin carries the consent line
+  ("By continuing you agree to the Terms and Privacy Policy.") with
+  both links; MarketingFooter Legal column points at the same URLs;
+  external-link idiom is `target="_blank" rel="noreferrer"`
+  (noopener is implied; apparule's `noopener noreferrer` converges on
+  next touch). Each repo's signin e2e pins the exact hrefs.
   **Contrast-token canon (ratified 2026-07-21, fleet)**: the
   tinted-chip recipe (`text-X on bg-X/14`) fails AA in light theme for
   mid-lightness hues — every hue used AS TEXT on its own tint ships a
