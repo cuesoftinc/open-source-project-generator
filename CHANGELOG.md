@@ -50,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` mobile standard: resolver-verified pin corrections from the
+  skeleton wave — riverpod_lint 3.x as a native analyzer plugin (custom_lint
+  retired), build_runner/freezed/intl caps, gen-l10n key removal,
+  go_router_builder public mixins, AGP 9 resValues default (#123).
+
 - `SKILL.md` mobile standard: legacy-quarantine rule — superseded code moves
   to `lib/legacy/` and is removed only after its replacement ships with an
   explicit user go (#121).
