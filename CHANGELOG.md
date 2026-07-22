@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md`: eight interaction-integrity locks from the mobile
+  interaction-contract audit (stale siblings, fake optimism, dead controls,
+  silent failures, danger ladder, MI primitives, destinations, forms) (#129).
+
 - `SKILL.md`: eight cross-platform parity canons from the apparule
   mobile↔web adjudication — chrome-scoped alignment, canon-fact sweep
   checklist, parity scope rules, session-restore gate, danger-ladder
