@@ -50,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` mobile standard: platform floors & flavor plumbing (iOS 15 with
+  Firebase 12, flutter-tool-only builds, load-bearing flavor config naming,
+  seed-bundling assertion in CI) and the safe-area contract with notched test
+  surfaces — both verified on live devices (#126).
+
 - `SKILL.md` mobile standard: goldens are authored on Linux (alchemist CI
   config normalizes text only; curve/gradient AA is platform-bound) via a
   dockerized regen script or dispatch workflow; `url_launcher` joins the
