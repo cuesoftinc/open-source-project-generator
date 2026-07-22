@@ -1232,6 +1232,28 @@ org canon.
   native projects live INSIDE the flutter root; icons/splash via
   flutter_launcher_icons + flutter_native_splash per flavor;
   `version: x.y.z+build` — humans own x.y.z, CI stamps build number.
+- **Platform floors & flavor plumbing (verified live 2026-07-22)**:
+  iOS floor is 15 (Firebase iOS SDK 12 requires it — the Flutter floor
+  of 13 does NOT build once firebase packages join). The pbxproj
+  `IPHONEOS_DEPLOYMENT_TARGET` is the single source: flutter_tools
+  rewrites the generated SwiftPM package's platform from it on every
+  build — raw `xcodebuild` BYPASSES that rewrite (and all flavor/asset
+  plumbing); always build through the flutter tool. iOS flavors: the
+  scheme/config NAMING is load-bearing — the tool derives the flavor
+  from the build configuration name (`Debug-dev` → flavor `dev`), and
+  flavor-scoped assets bundle ONLY when a flavor is carried, so a
+  schemeless build ships fakes with EMPTY seed stores. CI carries an
+  unsigned iOS simulator-build lane with a bundled-seed assertion.
+- **Safe-area contract (user-found on live devices 2026-07-22)**:
+  screen chrome insets via MediaQuery.viewPadding — fixed at CHROME
+  altitude (the shared top-bar paints behind the status bar, content
+  rows inset below), never per-screen hacks; immersive full-bleed
+  screens keep media edge-to-edge but inset their over-media bar
+  CONTENT. Test lock: a notched-MediaQuery helper asserting no
+  content in the top inset under BOTH platform profiles (iOS notch
+  ~59px, Android punch-hole ~39px), wired into every screen suite,
+  plus one notched golden per chrome kind. Plain test surfaces are
+  notchless — without this, inset bugs ship invisibly.
 - **Legacy quarantine (user directive 2026-07-21, carried from web)**:
   superseded mobile code is NEVER deleted up front — it moves
   structure-preserved into `lib/legacy/` (assets to `assets/legacy/`,
