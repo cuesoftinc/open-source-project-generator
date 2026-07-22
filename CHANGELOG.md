@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md` mobile standard: build-state hygiene at the gate — flutter
+  clean, daemon stops, docker image prunes, and DerivedData purges are part
+  of lane closeout (#130).
+
 - `SKILL.md`: eight interaction-integrity locks from the mobile
   interaction-contract audit (stale siblings, fake optimism, dead controls,
   silent failures, danger ladder, MI primitives, destinations, forms) (#129).
