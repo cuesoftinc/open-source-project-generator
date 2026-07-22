@@ -1200,6 +1200,39 @@ org canon.
   JSON from dev-flavor-scoped `assets/seed/`; per-flavor entrypoints
   (`main_dev/stg/main.dart`) pick the provider-override set. API wiring
   lands LAST behind unchanged repository interfaces.
+- **Cross-platform parity canons (adjudicated 2026-07-22, apparule
+  mobile↔web audit)**: (1) CHROME ALIGNMENT — header-bar titles are
+  true bar-width centered (on the bar, never the between-actions flex
+  remainder) on EVERY platform rendering the AppBar master, web
+  included; desktop-dashboard in-content page titles stay left-aligned
+  — centering rules are chrome-scoped, never page-scoped. A mobile
+  chrome ruling extends to web exactly where web renders the same
+  chrome component and stops at platform-idiom boundaries.
+  (2) CANON-FACT SWEEPS — when a product-fact changes, sweep ALL
+  clients + docs + canvas text + copy-locking tests + metadata (page
+  meta, PWA manifest, OG image + alt) + brand-asset GENERATOR scripts;
+  taglines encoding product mechanics get validated against the
+  ratified contract at write time. (3) PARITY SCOPE — C-rows without
+  an explicit "= B" sibling are platform-scoped by contract; never
+  manufacture a web twin; parity is adjudicated on narrative, not
+  chrome. (4) SESSION-RESTORE GATE — tri-state auth everywhere;
+  nothing routes or paints auth-dependent surfaces until restore
+  resolves; failed restore reads signed out (resolve null, never
+  reject past the boundary); a signed-in user never sees the auth
+  screen. (5) DANGER LADDER — the row rung is a first-class
+  quiet-danger Button kind; the armed rung's typed-confirm token is
+  product-ratified; a Figma kind-axis addition creates a
+  due-on-first-use obligation for every sibling platform.
+  (6) ENTITY REFERENCES — every avatar/username on a social surface
+  navigates to its canonical page platform-idiomatically; new
+  list/row/card components MUST expose the nav affordance in their
+  prop contract even if the first consumer doesn't wire it (exempt:
+  confirm dialogs, chat bubbles, marketing mocks, staff queues).
+  (7) UNIT TOGGLES are display-only over canonical units — always
+  convert display↔canonical on flip; never a toggle wired to state
+  but not conversion. (8) CROSS-CLIENT CONSTANTS (advisory ranges, QC
+  tables) live in ONE canonical doc listing that every client asserts
+  against in tests — no per-client drift.
 - **Canvas-first rule (user ratified 2026-07-22)**: NO screen ships
   without a Figma frame — a frameless screen is either DESIGNED FIRST
   (frames ratified, then implemented) or DROPPED if unnecessary to the

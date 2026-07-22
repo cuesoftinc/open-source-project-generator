@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md`: eight cross-platform parity canons from the apparule
+  mobile↔web adjudication — chrome-scoped alignment, canon-fact sweep
+  checklist, parity scope rules, session-restore gate, danger-ladder
+  additions, entity-reference affordances, unit-toggle conversion, and
+  single-listing cross-client constants (#128).
+
 - `SKILL.md` mobile standard: the canvas-first rule — every shipped screen
   has a Figma frame (design first or drop); frameless screens escape visual
   QA (#127).
