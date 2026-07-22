@@ -1325,6 +1325,15 @@ org canon.
   ~59px, Android punch-hole ~39px), wired into every screen suite,
   plus one notched golden per chrome kind. Plain test surfaces are
   notchless — without this, inset bugs ship invisibly.
+- **Build-state hygiene at the gate (third disk-zero event,
+  2026-07-22)**: every mobile lane's closeout runs `flutter clean` in
+  its worktree, stops gradle/dart daemons, and `docker image prune`s
+  golden-container images it pulled; device-install sessions purge
+  Xcode DerivedData when done. Host build state (DerivedData, gradle
+  caches, docker images/buildkit, flutter build dirs) is treated like
+  worktrees: cleaned at the GATE, never left for the disk-full crisis
+  — the host has hit zero three times from accumulated regenerable
+  build state.
 - **Legacy quarantine (user directive 2026-07-21, carried from web)**:
   superseded mobile code is NEVER deleted up front — it moves
   structure-preserved into `lib/legacy/` (assets to `assets/legacy/`,
