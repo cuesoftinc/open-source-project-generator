@@ -1211,7 +1211,12 @@ org canon.
   inference/raw-types; tests mirror lib/src (unit = ViewModels/repos/
   services with mocktail + ProviderContainer overrides; widget = every
   screen over fakes; golden = alchemist — golden_toolkit is
-  discontinued; E2E = patrol smoke journeys, nightly not per-PR).
+  discontinued. GOLDENS ARE AUTHORED ON LINUX: alchemist's ci config
+  only platform-normalizes TEXT (obscured fonts); curve/gradient/
+  shadow anti-aliasing is platform-bound, so macOS-generated goldens
+  fail Linux CI with small deterministic diffs (~0.02–1.6%). Regenerate
+  via the repo's dockerized script or the mobile-goldens dispatch
+  workflow — never bump tolerances to paper over platform drift; E2E = patrol smoke journeys, nightly not per-PR).
   CI: format check, codegen-fresh, analyze --fatal-infos + custom_lint,
   test --coverage with a gate, apk/ipa build matrix on main.
 - **Hygiene**: flavors mirror the ORG ENVIRONMENT MODEL, not the
