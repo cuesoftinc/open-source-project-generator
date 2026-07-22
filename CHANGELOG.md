@@ -50,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` mobile standard: goldens are authored on Linux (alchemist CI
+  config normalizes text only; curve/gradient AA is platform-bound) via a
+  dockerized regen script or dispatch workflow; `url_launcher` joins the
+  pin ledger (#125).
+
 - `SKILL.md` mobile standard: flavors mirror the org environment model —
   `dev` + `prod` only (the sandbox account is CueLABS production); the
   generic dev/stg/prd trio is rejected (#124).
