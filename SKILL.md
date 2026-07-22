@@ -1200,6 +1200,13 @@ org canon.
   JSON from dev-flavor-scoped `assets/seed/`; per-flavor entrypoints
   (`main_dev/stg/main.dart`) pick the provider-override set. API wiring
   lands LAST behind unchanged repository interfaces.
+- **Canvas-first rule (user ratified 2026-07-22)**: NO screen ships
+  without a Figma frame — a frameless screen is either DESIGNED FIRST
+  (frames ratified, then implemented) or DROPPED if unnecessary to the
+  ratified flow. "Restyled legacy" without a frame is how off-canon
+  visuals survive QA: convergence passes can only pixel-judge what the
+  canvas holds, so docs-only screens escape visual parity (the C6
+  guide shipped 2023 art this way — user-caught on device).
 - **Design system**: Material 3 + one ThemeExtension per token group,
   GENERATED from the product's Figma variables (tokens JSON in-repo is
   the reviewed artifact; Dart output never hand-edited); light+dark

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md` mobile standard: the canvas-first rule — every shipped screen
+  has a Figma frame (design first or drop); frameless screens escape visual
+  QA (#127).
+
 - `SKILL.md`: Mobile (Flutter) implementation standard — FVM-pinned toolchain,
   official MVVM+Repository vocabulary over a feature-first tree, Riverpod 3,
   typed go_router, mock-first fake repositories with seeded assets (TEST_MODE
