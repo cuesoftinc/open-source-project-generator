@@ -50,6 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` mobile standard: flavors mirror the org environment model —
+  `dev` + `prod` only (the sandbox account is CueLABS production); the
+  generic dev/stg/prd trio is rejected (#124).
+
 - `SKILL.md` mobile standard: resolver-verified pin corrections from the
   skeleton wave — riverpod_lint 3.x as a native analyzer plugin (custom_lint
   retired), build_runner/freezed/intl caps, gen-l10n key removal,

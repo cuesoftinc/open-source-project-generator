@@ -1214,8 +1214,13 @@ org canon.
   discontinued; E2E = patrol smoke journeys, nightly not per-PR).
   CI: format check, codegen-fresh, analyze --fatal-infos + custom_lint,
   test --coverage with a gate, apk/ipa build matrix on main.
-- **Hygiene**: flavors dev/stg/prd (applicationIdSuffix + iOS schemes,
-  `appFlavor` constant, flavor-scoped assets); secrets via
+- **Hygiene**: flavors mirror the ORG ENVIRONMENT MODEL, not the
+  generic trio — CueLABS has one real environment (the sandbox account
+  IS production, user directive 2026-07-22), so mobile ships exactly
+  `dev` (fakes, ".dev" suffix) + `prod` (bare id, sandbox Firebase,
+  Doppler stg config); add flavors only when a ratified environment
+  exists (applicationIdSuffix + iOS schemes, `appFlavor` constant,
+  flavor-scoped assets); secrets via
   `--dart-define-from-file=env/<flavor>.json` generated from Doppler,
   gitignored — never envied/obfuscation as security; gen-l10n with
   `synthetic-package: false` (flutter_gen removed in current Flutter);
