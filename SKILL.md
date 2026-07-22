@@ -1200,6 +1200,37 @@ org canon.
   JSON from dev-flavor-scoped `assets/seed/`; per-flavor entrypoints
   (`main_dev/stg/main.dart`) pick the provider-override set. API wiring
   lands LAST behind unchanged repository interfaces.
+- **Interaction-integrity locks (mobile audit 2026-07-22 — 72 defects,
+  8 classes; lock the class, not the instance)**: (1) STALE SIBLINGS —
+  under an always-mounted shell (StatefulShellRoute + Riverpod pause),
+  mutations MUST go through a per-domain facade owning a DECLARED
+  invalidation fan-out; ban ad-hoc ref.invalidate in screens/VMs; lock
+  = the two-surface contract test (one container, keep-alive listeners
+  on every declared derivation, mutate once, assert all rebuild) +
+  fakes persist state through the key-value store so restart tests
+  pass. (2) FAKE OPTIMISM — await-then-invalidate is NOT optimistic:
+  mutate local state synchronously, reconcile, rollback+toast on
+  error; body switches use skipLoadingOnRefresh; lock = the
+  pending-future morph test (Completer that never resolves; assert
+  the morph landed, no skeleton). (3) DEAD CONTROLS — null handler ⇒
+  affordance hidden/disabled, enforced per core/ui component with
+  null-callback tests + a per-screen traversal asserting every
+  enabled tappable has a handler. (4) SILENT FAILURES —
+  unawaited_futures + discarded_futures at ERROR severity; a shared
+  runAction (await→catch→toast→rollback, input preserved); every fake
+  carries a failNext seam with one failure-path test per mutating
+  surface. (5) DANGER LADDER — irreversible transitions are callable
+  only from confirm sheets born DISARMED (reason=null, CTA disabled);
+  arming tests, never defect-encoding tests. (6) MI PRIMITIVES —
+  every design-system microinteraction exists ONCE as a named core/ui
+  primitive; an MI-registry conformance test maps screen→active-MIs
+  from the contract and asserts the primitive is instantiated — a
+  screen cannot ship with an MI active-but-absent. (7) DESTINATIONS —
+  exhaustive kind→route mapping tests (no silent enum fallthroughs);
+  interstitial exits go(), never push(). (8) FORMS — one shared
+  parser/validator per input class; in-flight guards supersede,
+  never wedge; Completer-driven state-machine tests cover
+  input-during-flight.
 - **Cross-platform parity canons (adjudicated 2026-07-22, apparule
   mobile↔web audit)**: (1) CHROME ALIGNMENT — header-bar titles are
   true bar-width centered (on the bar, never the between-actions flex
