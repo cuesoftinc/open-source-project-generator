@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   TEST_MODE web canon (provider/store/seed/reset naming and the
   JSON-session-snapshot rule), org lint bans + wired testing-library
   preset, the README fleet template with badge row, bottom-right
-  dev indicators, and changelog-PR-ref amendment procedure.
+  dev indicators, and changelog-PR-ref amendment procedure (#133).
 
 - `SKILL.md` mobile standard: the repeating-MI test canon — screens hosting
   repeating MI primitives run their wiring suites and seeded goldens under
@@ -96,10 +96,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   no longer instructed; `release.yml` marked not-yet-landed; the
   byte-identical CI claim scoped to the shared web jobs with the mobile
   workflows noted; `stg` dropped from the entrypoint example; CodeQL
-  documented as GitHub default setup (API-checked, not a workflow file).
+  documented as GitHub default setup (API-checked, not a workflow file) (#133).
 
 - `README.md`: templates description covers the Docker/env/helm/terraform
-  templates; CueLABS™ brand mark applied in README and CONTRIBUTING.
+  templates; CueLABS™ brand mark applied in README and CONTRIBUTING (#133).
 
 - `SKILL.md` mobile standard: platform floors & flavor plumbing (iOS 15 with
   Firebase 12, flutter-tool-only builds, load-bearing flavor config naming,
