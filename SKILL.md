@@ -1288,6 +1288,19 @@ org canon.
   fail Linux CI with small deterministic diffs (~0.02–1.6%). Regenerate
   via the repo's dockerized script or the mobile-goldens dispatch
   workflow — never bump tolerances to paper over platform drift; E2E = patrol smoke journeys, nightly not per-PR).
+  **Repeating-MI test canon (ratified 2026-07-23, apparule Lane B)**:
+  once a screen hosts a REPEATING MI primitive (pulse/typing/shimmer),
+  `pumpAndSettle` never terminates on it — wiring/transition suites and
+  seeded screen goldens for such screens run under the platform
+  reduced-motion flag (`FakeAccessibilityFeatures(disableAnimations:
+  true)` / a `disableAnimations` MediaQuery wrapper), which every MI
+  primitive must honor per design.md §5 (same anatomy, static); the
+  MOTION itself is covered by the primitive's own bounded-pump unit
+  tests. Corollary: animated size/draw progress inside
+  IntrinsicHeight-measured rows must be PAINTED, never laid out — a
+  FractionallySizedBox at heightFactor 0 reports an infinite max
+  intrinsic (child ÷ 0) and crashes the row on frame one (found live:
+  the MI-14 connector draw inside the C8 timeline rows).
   CI: format check, codegen-fresh, analyze --fatal-infos + custom_lint,
   test --coverage with a gate, apk/ipa build matrix on main.
 - **Hygiene**: flavors mirror the ORG ENVIRONMENT MODEL, not the

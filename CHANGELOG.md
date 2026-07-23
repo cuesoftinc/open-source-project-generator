@@ -9,9 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md` mobile standard: the repeating-MI test canon — screens hosting
+  repeating MI primitives run their wiring suites and seeded goldens under
+  the platform reduced-motion flag (motion stays covered by the primitives'
+  bounded-pump unit tests), and animated size/draw progress inside
+  IntrinsicHeight rows is painted, never laid out (a fractional sizer at
+  factor 0 reports an infinite intrinsic and crashes the row) (#131).
+
 - `SKILL.md` mobile standard: the E2E lane canon (patrol journeys, nightly
   cadence, prove-then-revert for dispatch-only workflows) and the on-device
-  IME-injection gotcha (#131).
+  IME-injection gotcha (#132).
 
 - `SKILL.md` mobile standard: build-state hygiene at the gate — flutter
   clean, daemon stops, docker image prunes, and DerivedData purges are part
