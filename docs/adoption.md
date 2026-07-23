@@ -33,6 +33,8 @@ External projects can install a single focused skill and use the portable
 
 ```bash
 gh skill install cuesoftinc/oss-engineering-standards \
+  cuelabs-engineering-standards --agent cursor --scope project
+gh skill install cuesoftinc/oss-engineering-standards \
   cuelabs-web-standard --agent cursor --scope project
 ```
 
@@ -42,7 +44,7 @@ Copy the example:
 
 ```bash
 mkdir -p .cuelabs
-cp skills/cuelabs-engineering-standards/assets/project.example.yaml \
+cp .agents/skills/cuelabs-engineering-standards/assets/project.example.yaml \
   .cuelabs/project.yaml
 ```
 

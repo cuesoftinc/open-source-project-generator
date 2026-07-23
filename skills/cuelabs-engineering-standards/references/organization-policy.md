@@ -19,6 +19,8 @@ flowchart LR
     AC --> SVC["api/&lt;svc&gt; — Python/…<br/>Cloud Run"]
     AC --> DATA[("per product: Firestore (apparule)<br/>or Aiven Postgres · + shared Aiven Redis<br/>· Cloud Storage")]
 ```
+- The reference implementation is **`cuesoftinc/apparule`** — when in doubt
+  about a convention's concrete shape, mirror it.
 - Auth: Firebase Authentication, **Google sign-in ONLY** — no username/password
   signup or login anywhere in the ecosystem. Enforce at three layers:
   Email/Password provider disabled on the Firebase project; backends reject

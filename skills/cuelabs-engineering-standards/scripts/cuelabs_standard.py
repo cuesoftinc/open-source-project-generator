@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import shutil
+import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from datetime import date
@@ -328,15 +329,19 @@ def validate_manifest_data(data: dict[str, Any]) -> list[str]:
                 if not isinstance(expires, str):
                     errors.append(f"{prefix}.expires must be a date or null")
                 else:
-                    try:
-                        expiration = date.fromisoformat(expires)
-                    except ValueError:
+                    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", expires):
                         errors.append(f"{prefix}.expires must use YYYY-MM-DD")
                     else:
-                        if expiration < date.today():
-                            errors.append(
-                                f"{prefix}.expires has passed ({expiration.isoformat()})"
-                            )
+                        try:
+                            expiration = date.fromisoformat(expires)
+                        except ValueError:
+                            errors.append(f"{prefix}.expires must use YYYY-MM-DD")
+                        else:
+                            if expiration < date.today():
+                                errors.append(
+                                    f"{prefix}.expires has passed "
+                                    f"({expiration.isoformat()})"
+                                )
     return errors
 
 
@@ -369,14 +374,26 @@ def infer_surfaces(repo: Path) -> dict[str, str]:
     return {name: ("active" if active else "not-detected") for name, active in checks.items()}
 
 
+def aggregate_status(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        statuses = set(value.values())
+        for status in ("active", "planned", "paused", "absent"):
+            if status in statuses:
+                return status
+    return "absent"
+
+
 def declared_surfaces(data: dict[str, Any]) -> dict[str, str]:
     declared = data["surfaces"]
     mobile = declared.get("mobile", {})
     if not isinstance(mobile, dict):
         mobile = {}
+    backend = declared.get("backend", declared.get("api", "absent"))
     return {
         "web": str(declared.get("web", "absent")),
-        "go-api": str(declared.get("backend", declared.get("api", "absent"))),
+        "go-api": aggregate_status(backend),
         "flutter": str(mobile.get("flutter", declared.get("flutter", "absent"))),
         "helm": (
             "active"
@@ -643,10 +660,33 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def is_git_worktree(repo: Path) -> bool:
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "rev-parse",
+                "--is-inside-work-tree",
+                "--show-toplevel",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+    lines = result.stdout.splitlines()
+    if result.returncode != 0 or len(lines) != 2 or lines[0] != "true":
+        return False
+    return Path(lines[1]).resolve() == repo.resolve()
+
+
 def main() -> int:
     args = parse_args()
     repo = Path(args.repo).expanduser().resolve()
-    if not (repo / ".git").exists():
+    if not is_git_worktree(repo):
         print(f"error: not a git repository: {repo}", file=sys.stderr)
         return 2
 

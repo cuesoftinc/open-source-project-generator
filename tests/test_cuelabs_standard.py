@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import importlib.util
+import io
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from datetime import date, timedelta
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -207,6 +212,63 @@ class StandardsCliTest(unittest.TestCase):
         self.assertTrue(any("has passed" in error for error in audit.manifest_errors))
         with self.assertRaises(standard.ManifestError):
             standard.apply_missing(self.repo)
+
+    def test_basic_iso_deviation_date_is_rejected(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_text(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: base\n"
+            "surfaces:\n"
+            "  web: absent\n"
+            "deviations:\n"
+            "  - id: EX-1\n"
+            "    reason: Malformed date\n"
+            '    expires: "20991231"\n'
+        )
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "invalid")
+        self.assertTrue(
+            any("must use YYYY-MM-DD" in error for error in audit.manifest_errors)
+        )
+
+    def test_nested_backend_status_activates_application_requirements(self) -> None:
+        self.write_manifest("  backend:\n    go: active\n")
+        self.copy_required_templates(application=True)
+        (self.repo / ".github" / "dependabot.yml").write_text("version: 2\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.surfaces["go-api"], "active")
+        self.assertTrue(audit.conforming)
+
+    def test_cli_rejects_fake_git_metadata_before_apply(self) -> None:
+        shutil.rmtree(self.repo / ".git")
+        (self.repo / ".git").write_text("not git metadata\n")
+        stderr = io.StringIO()
+
+        with mock.patch.object(
+            sys, "argv", ["cuelabs_standard.py", "apply", "--repo", str(self.repo)]
+        ):
+            with redirect_stderr(stderr):
+                exit_code = standard.main()
+
+        self.assertEqual(exit_code, 2)
+        self.assertIn("not a git repository", stderr.getvalue())
+        self.assertFalse((self.repo / ".gitignore").exists())
+
+    def test_git_worktree_validation_accepts_repository_root(self) -> None:
+        subprocess.run(
+            ["git", "init", "--quiet", str(self.repo)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertTrue(standard.is_git_worktree(self.repo))
 
     def test_apply_rejects_symlinked_template_parent(self) -> None:
         self.write_manifest("  web: absent\n")
