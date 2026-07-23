@@ -277,6 +277,49 @@ class StandardsCliTest(unittest.TestCase):
         self.assertEqual(audit.manifest, "valid")
         self.assertIsNone(audit.active_deviations[0]["expires"])
 
+    def test_flow_style_surfaces_are_parsed(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_text(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces: { web: active, mobile: { flutter: planned } }\n"
+            "capabilities: {}\n"
+            "deployment: {}\n"
+            "deviations: []\n"
+        )
+        self.copy_required_templates(application=True)
+        (self.repo / ".github" / "dependabot.yml").write_text("version: 2\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "valid")
+        self.assertEqual(audit.surfaces["web"], "active")
+        self.assertEqual(audit.surfaces["flutter"], "planned")
+        self.assertTrue(audit.conforming)
+
+    def test_flow_style_deviations_are_parsed(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_text(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces: { web: absent }\n"
+            "capabilities: {}\n"
+            "deployment: {}\n"
+            "deviations: [{ id: EX-1, reason: Flow exception, expires: null }]\n"
+        )
+        self.copy_required_templates(application=False)
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "valid")
+        self.assertEqual(audit.active_deviations[0]["id"], "EX-1")
+        self.assertIsNone(audit.active_deviations[0]["expires"])
+        self.assertTrue(audit.conforming)
+
     def test_nested_backend_status_activates_application_requirements(self) -> None:
         self.write_manifest("  backend:\n    go: active\n")
         self.copy_required_templates(application=True)

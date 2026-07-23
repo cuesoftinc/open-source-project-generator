@@ -113,12 +113,99 @@ class PlanStep:
     reason: str
 
 
+def split_flow_items(value: str, delimiter: str) -> list[str]:
+    items: list[str] = []
+    start = 0
+    stack: list[str] = []
+    quote: str | None = None
+    escaped = False
+    index = 0
+    while index < len(value):
+        character = value[index]
+        if quote == '"':
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                quote = None
+            index += 1
+            continue
+        if quote == "'":
+            if character == "'" and index + 1 < len(value) and value[index + 1] == "'":
+                index += 2
+                continue
+            if character == "'":
+                quote = None
+            index += 1
+            continue
+        if character in {"'", '"'}:
+            quote = character
+        elif character in "[{":
+            stack.append(character)
+        elif character in "]}":
+            expected = "[" if character == "]" else "{"
+            if not stack or stack.pop() != expected:
+                raise ManifestError("unbalanced flow collection")
+        elif character == delimiter and not stack:
+            items.append(value[start:index].strip())
+            start = index + 1
+        index += 1
+
+    if quote is not None or stack:
+        raise ManifestError("unterminated flow collection")
+    items.append(value[start:].strip())
+    return items
+
+
+def split_flow_mapping_entry(value: str) -> tuple[str, str]:
+    parts = split_flow_items(value, ":")
+    if len(parts) < 2:
+        raise ManifestError(f"expected a key-value pair in flow mapping: {value!r}")
+    return parts[0], ":".join(parts[1:]).strip()
+
+
+def parse_flow_collection(value: str) -> Any:
+    opening, closing = value[0], value[-1]
+    if (opening, closing) not in {("{", "}"), ("[", "]")}:
+        raise ManifestError("unbalanced flow collection")
+    content = value[1:-1].strip()
+    if not content:
+        return {} if opening == "{" else []
+
+    items = split_flow_items(content, ",")
+    if items[-1] == "":
+        items.pop()
+    if any(not item for item in items):
+        raise ManifestError("empty item in flow collection")
+    if opening == "[":
+        return [parse_scalar(item) for item in items]
+
+    mapping: dict[str, Any] = {}
+    for item in items:
+        raw_key, raw_value = split_flow_mapping_entry(item)
+        if not raw_key or not raw_value:
+            raise ManifestError(f"incomplete flow mapping entry: {item!r}")
+        if raw_key[0:1] in {"'", '"'}:
+            key = parse_scalar(raw_key)
+        else:
+            key = raw_key
+        if not isinstance(key, str) or not re.fullmatch(
+            r"[A-Za-z][A-Za-z0-9_-]*", key
+        ):
+            raise ManifestError(f"invalid flow mapping key {raw_key!r}")
+        if key in mapping:
+            raise ManifestError(f"duplicate key {key!r}")
+        mapping[key] = parse_scalar(raw_value)
+    return mapping
+
+
 def parse_scalar(value: str) -> Any:
     value = value.strip()
     if value in {"", "null", "Null", "NULL", "~"}:
         return None
-    if value in {"[]", "{}"}:
-        return [] if value == "[]" else {}
+    if value.startswith(("{", "[")) or value.endswith(("}", "]")):
+        return parse_flow_collection(value)
     if value.lower() in {"true", "false"}:
         return value.lower() == "true"
     if re.fullmatch(r"-?[0-9]+", value):
