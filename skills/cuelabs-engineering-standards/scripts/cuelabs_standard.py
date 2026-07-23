@@ -319,6 +319,38 @@ def expand_block_scalars(text: str) -> str:
     return "\n".join(expanded)
 
 
+def strip_yaml_comment(content: str) -> str:
+    quote: str | None = None
+    escaped = False
+    index = 0
+    while index < len(content):
+        character = content[index]
+        if quote == '"':
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                quote = None
+        elif quote == "'":
+            if (
+                character == "'"
+                and index + 1 < len(content)
+                and content[index + 1] == "'"
+            ):
+                index += 1
+            elif character == "'":
+                quote = None
+        elif character in {"'", '"'}:
+            quote = character
+        elif character == "#" and (
+            index == 0 or content[index - 1].isspace()
+        ):
+            return content[:index].rstrip()
+        index += 1
+    return content
+
+
 def yaml_tokens(text: str) -> list[tuple[int, str, int]]:
     tokens: list[tuple[int, str, int]] = []
     for line_number, raw in enumerate(text.splitlines(), 1):
@@ -331,16 +363,7 @@ def yaml_tokens(text: str) -> list[tuple[int, str, int]]:
             raise ManifestError(
                 f"line {line_number}: indentation must use multiples of two spaces"
             )
-        content = raw.strip()
-        quote: str | None = None
-        for index, character in enumerate(content):
-            if character in {"'", '"'}:
-                quote = None if quote == character else (character if quote is None else quote)
-            elif character == "#" and quote is None and (
-                index == 0 or content[index - 1].isspace()
-            ):
-                content = content[:index].rstrip()
-                break
+        content = strip_yaml_comment(raw.strip())
         if content:
             tokens.append((indent, content, line_number))
     return tokens
@@ -580,7 +603,10 @@ def declared_surfaces(data: dict[str, Any]) -> dict[str, str]:
         if isinstance(mobile, dict)
         else mobile
     )
-    backend = declared.get("backend", declared.get("api", "absent"))
+    backend = declared.get(
+        "backend",
+        declared.get("api", declared.get("go-api", "absent")),
+    )
     return {
         "web": aggregate_status(declared.get("web", "absent")),
         "go-api": aggregate_status(backend),

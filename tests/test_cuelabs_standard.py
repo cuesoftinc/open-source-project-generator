@@ -374,6 +374,33 @@ class StandardsCliTest(unittest.TestCase):
         self.assertEqual(data["deviations"][0]["id"], "EX-1")
         self.assertIsNone(data["deviations"][0]["expires"])
 
+    def test_escaped_quote_does_not_expose_hash_as_comment(self) -> None:
+        data = standard.parse_yaml_subset(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces: { web: absent }\n"
+            "deviations:\n"
+            '  - reason: "Owner wrote \\" # still part of the reason"\n'
+            "    id: EX-1\n"
+            "    expires: null\n"
+        )
+
+        self.assertEqual(
+            data["deviations"][0]["reason"],
+            'Owner wrote " # still part of the reason',
+        )
+
+    def test_go_api_surface_alias_activates_application_requirements(self) -> None:
+        self.write_manifest("  go-api: active\n")
+        self.copy_required_templates(application=True)
+        (self.repo / ".github" / "dependabot.yml").write_text("version: 2\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.surfaces["go-api"], "active")
+        self.assertTrue(audit.conforming)
+
     def test_nested_backend_status_activates_application_requirements(self) -> None:
         self.write_manifest("  backend:\n    go: active\n")
         self.copy_required_templates(application=True)
