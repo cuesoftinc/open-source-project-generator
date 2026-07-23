@@ -183,6 +183,51 @@ class StandardsCliTest(unittest.TestCase):
             )
         )
 
+    def test_indentationless_deviation_sequence_is_parsed(self) -> None:
+        data = standard.parse_yaml_subset(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces: { web: absent }\n"
+            "deviations:\n"
+            "- id: EX-1\n"
+            "  reason: Valid indentationless sequence\n"
+            "  expires: null\n"
+        )
+
+        self.assertEqual(data["deviations"][0]["id"], "EX-1")
+        self.assertEqual(
+            data["deviations"][0]["reason"],
+            "Valid indentationless sequence",
+        )
+        self.assertIsNone(data["deviations"][0]["expires"])
+
+    def test_unsupported_yaml_features_fail_explicitly(self) -> None:
+        cases = {
+            "anchors": "value: &shared active\n",
+            "aliases": "value: *shared\n",
+            "tags": "value: !custom active\n",
+            "merge keys": "<<: { web: active }\n",
+            "directives": "%YAML 1.2\nvalue: active\n",
+            "document markers": "---\nvalue: active\n",
+            "complex YAML keys": "? [web, active]\n: value\n",
+        }
+
+        for feature, manifest in cases.items():
+            with self.subTest(feature=feature):
+                with self.assertRaisesRegex(standard.ManifestError, feature):
+                    standard.parse_yaml_subset(manifest)
+
+    def test_reserved_yaml_indicators_inside_strings_are_preserved(self) -> None:
+        data = standard.parse_yaml_subset(
+            'reason: "Use &shared, *alias, and !tag as literal text"\n'
+        )
+
+        self.assertEqual(
+            data["reason"],
+            "Use &shared, *alias, and !tag as literal text",
+        )
+
     def test_apply_requires_manifest_before_modifying_active_product(self) -> None:
         (self.repo / "web").mkdir()
         (self.repo / "web" / "package.json").write_text('{"name":"fixture"}\n')
@@ -400,6 +445,39 @@ class StandardsCliTest(unittest.TestCase):
 
         self.assertEqual(audit.surfaces["go-api"], "active")
         self.assertTrue(audit.conforming)
+
+    def test_additional_go_service_requires_manifest(self) -> None:
+        service = self.repo / "api" / "measure"
+        service.mkdir(parents=True)
+        (service / "go.mod").write_text("module example.com/measure\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.surfaces["go-api"], "active")
+        self.assertEqual(audit.manifest, "missing")
+        self.assertFalse(audit.conforming)
+        with self.assertRaises(standard.ManifestError):
+            standard.apply_missing(self.repo)
+
+    def test_web_skill_bundles_canonical_prettierignore(self) -> None:
+        core = (
+            ROOT
+            / "skills"
+            / "cuelabs-engineering-standards"
+            / "assets"
+            / "templates"
+            / "prettierignore.web"
+        )
+        web = (
+            ROOT
+            / "skills"
+            / "cuelabs-web-standard"
+            / "assets"
+            / "templates"
+            / "prettierignore.web"
+        )
+
+        self.assertEqual(web.read_bytes(), core.read_bytes())
 
     def test_nested_backend_status_activates_application_requirements(self) -> None:
         self.write_manifest("  backend:\n    go: active\n")

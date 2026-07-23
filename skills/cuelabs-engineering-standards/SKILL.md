@@ -32,6 +32,8 @@ to change, fix, bootstrap, or standardize the repository.
 - Read [references/organization-policy.md](references/organization-policy.md)
   for CueLABS identity, API, documentation, data, telemetry, and environment
   policy.
+- Read [references/project-manifest.md](references/project-manifest.md) before
+  authoring or repairing `.cuelabs/project.yaml`.
 - Read [references/qa-and-orchestration.md](references/qa-and-orchestration.md)
   when coordinating multiple repositories or closing a QA/merge loop.
 - Read [references/recommended-versions.md](references/recommended-versions.md)

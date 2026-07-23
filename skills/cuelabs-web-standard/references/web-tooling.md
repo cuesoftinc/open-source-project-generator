@@ -24,8 +24,8 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   marked config section keyed by `package.json` name; every rule is
   negative-tested (fires on an injected violation).
 - **Prettier** — byte-identical `.prettierrc`/`.prettierignore`;
-  `.prettierignore` is sourced from the core skill's
-  `assets/templates/prettierignore.web` and carries
+  `.prettierignore` is sourced from this skill's
+  [bundled template](../assets/templates/prettierignore.web) and carries
   the fleet superset of generated OpenAPI + protocol-client paths so products
   never customize it when gRPC arrives; one brace glob
   `**/*.{ts,tsx,js,jsx,mjs,cjs}` (prettier hard-errors on zero-match patterns —

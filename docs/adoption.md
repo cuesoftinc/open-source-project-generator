@@ -56,7 +56,10 @@ Record only current, approved state:
 - `absent`: deliberately out of scope.
 
 Do not mark a backend or mobile app active merely because the standard supports
-one.
+one. Follow the engineering skill's
+[project manifest syntax](../skills/cuelabs-engineering-standards/references/project-manifest.md);
+unsupported YAML features fail explicitly so editor and CI behavior stays
+portable.
 
 ## Adoption sequence
 

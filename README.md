@@ -117,6 +117,9 @@ writes through symlinked paths.
 - Each product owns its current state in `.cuelabs/project.yaml`; the standards
   repository defines the schema, not whether a product backend or mobile app is
   currently ready.
+- Manifests use the documented
+  [dependency-free YAML subset](skills/cuelabs-engineering-standards/references/project-manifest.md);
+  the schema validates data shape rather than expanding the accepted syntax.
 
 The example and JSON Schema live under
 `skills/cuelabs-engineering-standards/assets/`.

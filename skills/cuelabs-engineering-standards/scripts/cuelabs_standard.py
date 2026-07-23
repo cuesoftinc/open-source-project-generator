@@ -351,6 +351,72 @@ def strip_yaml_comment(content: str) -> str:
     return content
 
 
+def unsupported_yaml_indicator(content: str) -> str | None:
+    quote: str | None = None
+    escaped = False
+    index = 0
+    while index < len(content):
+        character = content[index]
+        if quote == '"':
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                quote = None
+        elif quote == "'":
+            if (
+                character == "'"
+                and index + 1 < len(content)
+                and content[index + 1] == "'"
+            ):
+                index += 1
+            elif character == "'":
+                quote = None
+        elif character in {"'", '"'}:
+            quote = character
+        elif character in {"&", "*", "!"} and (
+            index == 0
+            or content[index - 1].isspace()
+            or content[index - 1] in "[{,:-"
+        ):
+            return {
+                "&": "anchors",
+                "*": "aliases",
+                "!": "tags",
+            }[character]
+        index += 1
+    return None
+
+
+def validate_yaml_subset_syntax(text: str) -> None:
+    for line_number, raw in enumerate(text.splitlines(), 1):
+        content = strip_yaml_comment(raw.strip())
+        if not content:
+            continue
+        if content.startswith("%"):
+            raise ManifestError(
+                f"line {line_number}: YAML directives are not supported"
+            )
+        if content in {"---", "..."}:
+            raise ManifestError(
+                f"line {line_number}: YAML document markers are not supported"
+            )
+        if content.startswith("?"):
+            raise ManifestError(
+                f"line {line_number}: complex YAML keys are not supported"
+            )
+        if re.match(r"(?:-\s+)?<<\s*:", content):
+            raise ManifestError(
+                f"line {line_number}: YAML merge keys are not supported"
+            )
+        indicator = unsupported_yaml_indicator(content)
+        if indicator is not None:
+            raise ManifestError(
+                f"line {line_number}: YAML {indicator} are not supported"
+            )
+
+
 def yaml_tokens(text: str) -> list[tuple[int, str, int]]:
     tokens: list[tuple[int, str, int]] = []
     for line_number, raw in enumerate(text.splitlines(), 1):
@@ -442,13 +508,21 @@ def parse_yaml_block(
             container[key] = parse_scalar(raw_value)
         elif index < len(tokens) and tokens[index][0] > indent:
             container[key], index = parse_yaml_block(tokens, index, tokens[index][0])
+        elif (
+            index < len(tokens)
+            and tokens[index][0] == indent
+            and tokens[index][1].startswith("-")
+        ):
+            container[key], index = parse_yaml_block(tokens, index, indent)
         else:
             container[key] = None
     return container, index
 
 
 def parse_yaml_subset(text: str) -> dict[str, Any]:
-    tokens = yaml_tokens(expand_block_scalars(text))
+    expanded = expand_block_scalars(text)
+    validate_yaml_subset_syntax(expanded)
+    tokens = yaml_tokens(expanded)
     if not tokens:
         raise ManifestError("manifest is empty")
     if tokens[0][0] != 0:
@@ -576,7 +650,7 @@ def load_manifest(path: Path, *, required: bool) -> Manifest:
 def infer_surfaces(repo: Path) -> dict[str, str]:
     checks = {
         "web": (repo / "web" / "package.json").is_file(),
-        "go-api": (repo / "api" / "common" / "go.mod").is_file(),
+        "go-api": any((repo / "api").glob("*/go.mod")),
         "flutter": (repo / "mobile" / "flutter" / "pubspec.yaml").is_file(),
         "helm": (repo / "deploy" / "helm" / "Chart.yaml").is_file(),
         "terraform": any((repo / "deploy" / "terraform").glob("*.tf")),
