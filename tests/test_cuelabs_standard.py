@@ -105,6 +105,19 @@ class StandardsCliTest(unittest.TestCase):
         with self.assertRaises(standard.ManifestError):
             standard.apply_missing(self.repo)
 
+    def test_invalid_utf8_manifest_is_reported_without_traceback(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_bytes(b"schemaVersion: 1\nname: \xff\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "invalid")
+        self.assertTrue(any("decode" in error for error in audit.manifest_errors))
+        self.assertFalse(audit.conforming)
+        with self.assertRaises(standard.ManifestError):
+            standard.apply_missing(self.repo)
+
     def test_plan_is_ordered_and_distinguishes_manual_and_automatic(self) -> None:
         (self.repo / "web").mkdir()
         (self.repo / "web" / "package.json").write_text('{"name":"fixture"}\n')
@@ -227,6 +240,15 @@ class StandardsCliTest(unittest.TestCase):
             data["reason"],
             "Use &shared, *alias, !tag, and <<: as literal text",
         )
+
+    def test_unquoted_reserved_indicator_scalars_are_rejected(self) -> None:
+        for value in ("- invalid", "? invalid", "@invalid", "`invalid"):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(
+                    standard.ManifestError,
+                    "reserved YAML indicator",
+                ):
+                    standard.parse_yaml_subset(f"reason: {value}\n")
 
     def test_apply_requires_manifest_before_modifying_active_product(self) -> None:
         (self.repo / "web").mkdir()

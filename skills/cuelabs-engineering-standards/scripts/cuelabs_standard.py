@@ -217,6 +217,17 @@ def parse_scalar(value: str) -> Any:
             raise ManifestError(f"invalid quoted scalar: {error}") from error
     if len(value) >= 2 and value[0] == value[-1] == "'":
         return value[1:-1].replace("''", "'")
+    if (
+        value[0] in ",[]{}#&*!|>'\"%@`"
+        or (
+            value[0] in "-?:"
+            and (len(value) == 1 or value[1].isspace())
+        )
+    ):
+        raise ManifestError(
+            f"plain scalar {value!r} begins with a reserved YAML indicator; "
+            "quote the value"
+        )
     return value
 
 
@@ -645,7 +656,7 @@ def load_manifest(path: Path, *, required: bool) -> Manifest:
         )
     try:
         data = parse_yaml_subset(path.read_text())
-    except (OSError, ManifestError) as error:
+    except (OSError, UnicodeError, ManifestError) as error:
         return Manifest("invalid", "unknown", None, [str(error)])
     errors = validate_manifest_data(data)
     if errors:
