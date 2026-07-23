@@ -13,7 +13,7 @@ Report privately using GitHub's
 [private vulnerability reporting](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability)
 through the repository's **Security → Report a vulnerability** tab. CueLABS™
 public repositories must enable private vulnerability reporting before
-publishing this policy. If that tab is unavailable, email `hello@cuesoft.io`
+publishing this policy. If that tab is unavailable, email `security@cuesoft.io`
 with the subject `Security vulnerability: <repository name>`. Do not disclose
 the vulnerability in an issue, discussion, or pull request.
 
