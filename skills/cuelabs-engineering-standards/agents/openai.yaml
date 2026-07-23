@@ -1,0 +1,4 @@
+interface:
+  display_name: "CueLABS Engineering Standards"
+  short_description: "Standardize CueLABS repositories safely"
+  default_prompt: "Use $cuelabs-engineering-standards to audit and standardize this repository."

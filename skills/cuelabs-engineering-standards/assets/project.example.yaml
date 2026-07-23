@@ -1,0 +1,19 @@
+schemaVersion: 1
+name: example-product
+profile: cuelabs
+
+surfaces:
+  web: active
+  backend: planned
+  mobile:
+    flutter: planned
+
+capabilities:
+  grpc: planned
+  firebaseAuth: planned
+
+deployment:
+  web: firebase-app-hosting
+  api: none
+
+deviations: []

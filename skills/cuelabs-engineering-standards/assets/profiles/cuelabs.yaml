@@ -1,0 +1,33 @@
+schemaVersion: 1
+name: cuelabs
+extends: base
+description: CueLABS organization policy layered over the portable base profile.
+
+identity:
+  provider: firebase
+  interactiveSignIn:
+    - google
+
+delivery:
+  web: firebase-app-hosting
+  api: cloud-run
+  selfHost: helm
+  infrastructure: cuesoft-iac
+  secretSource: doppler
+
+architecture:
+  primaryApiDirectory: api/common
+  primaryApiLanguage: go
+  defaultApiTransport: http-json
+  optionalApiTransports:
+    - grpc
+  webDirectory: web
+  mobileDirectory: mobile/flutter
+
+observability:
+  standard: opentelemetry
+  transport: otlp
+
+sharedFiles:
+  source: assets/templates
+  overwriteExisting: false

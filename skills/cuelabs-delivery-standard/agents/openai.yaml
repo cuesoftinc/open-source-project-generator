@@ -1,0 +1,4 @@
+interface:
+  display_name: "CueLABS Delivery Standard"
+  short_description: "Standardize CI, packaging, and delivery"
+  default_prompt: "Use $cuelabs-delivery-standard to audit or standardize delivery for this repository."

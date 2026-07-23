@@ -1,0 +1,18 @@
+schemaVersion: 1
+name: base
+description: Portable open-source repository hygiene and delivery defaults.
+
+requirements:
+  communityHealth: true
+  documentedArchitecture: true
+  documentedSecurityPolicy: true
+  leastPrivilegeCI: true
+  deterministicBuilds: true
+  testChangedBehavior: true
+  preserveApplicationCodeDuringStandardization: true
+
+conventions:
+  servicesNamedByFunction: true
+  onlyCreateImplementedSurfaces: true
+  generatedCodeKeepsGeneratedNames: true
+  secretsStayOutOfGit: true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CueLABS Design Standard"
+  short_description: "Align CueLABS design systems and QA"
+  default_prompt: "Use $cuelabs-design-standard to implement or audit this CueLABS design system."

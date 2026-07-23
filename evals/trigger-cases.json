@@ -1,0 +1,114 @@
+{
+  "skills": {
+    "cuelabs-engineering-standards": [
+      {
+        "prompt": "Audit this repository against CueLABS standards.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Bootstrap a new CueLABS repository with web only.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Fix the arithmetic bug in this function.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Summarize this pull request.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Should this repository adopt the shared Makefile?",
+        "expect": "ambiguous"
+      }
+    ],
+    "cuelabs-web-standard": [
+      {
+        "prompt": "Implement this Figma dashboard in the CueLABS Next.js app.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Audit our TEST_MODE provider and mock API.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Repair the Go readiness handler.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Create a Flutter golden test.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Review whether this public page follows product conventions.",
+        "expect": "ambiguous"
+      }
+    ],
+    "cuelabs-mobile-standard": [
+      {
+        "prompt": "Start the approved Flutter implementation for this product.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Audit Riverpod invalidation across these mobile screens.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Fix the Next.js marketing footer.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Standardize the Helm chart.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "We may add a mobile app later; make the repository ready.",
+        "expect": "ambiguous"
+      }
+    ],
+    "cuelabs-delivery-standard": [
+      {
+        "prompt": "Standardize GitHub Actions without adding the planned backend.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Audit the Docker, Helm, and Terraform delivery path.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Restyle this dashboard card.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Rewrite the product requirements document.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Prepare this repository for a release someday.",
+        "expect": "ambiguous"
+      }
+    ],
+    "cuelabs-design-standard": [
+      {
+        "prompt": "Audit the CueLABS Figma component library and token modes.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Run a completeness and polish QA loop on these screens.",
+        "expect": "trigger"
+      },
+      {
+        "prompt": "Fix the Python API test.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Upgrade the GitHub Actions checkout version.",
+        "expect": "do-not-trigger"
+      },
+      {
+        "prompt": "Check whether the product experience is consistent.",
+        "expect": "ambiguous"
+      }
+    ]
+  }
+}

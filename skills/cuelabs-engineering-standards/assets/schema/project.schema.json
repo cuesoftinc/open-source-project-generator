@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuelabs.cuesoft.io/schemas/project.schema.json",
+  "title": "CueLABS project manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "name", "profile", "surfaces"],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["base", "cuelabs"]
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/status"
+          },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/status"
+            }
+          }
+        ]
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/status"
+      },
+      "default": {}
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "reason"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "expires": {
+            "type": ["string", "null"],
+            "format": "date"
+          }
+        }
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": ["active", "planned", "paused", "absent"]
+    }
+  }
+}
