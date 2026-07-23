@@ -132,11 +132,12 @@ repo uses one); the home page
 renders its own shell; `/dashboard` gets a nested `layout.tsx`. `@/*` → `./src/*`,
 `output: "standalone"`.
 
-**Flutter (`mobile/flutter`):**
+**Flutter (`mobile/flutter`):** feature-first per the mobile standard
+(see the Mobile section below — the single source for the tree):
 ```
-lib/main.dart
-lib/src/features/<feature>/   lib/src/core/{theme,localization}
-lib/src/services/  lib/src/shared/{,model}   lib/l10n/ (generated — stays)
+lib/main.dart + lib/main_dev.dart          (per-flavor entrypoints)
+lib/src/features/<feature>/{presentation,domain,data}
+lib/src/{app,routing,core}                 (core/ui = the design system)
 ```
 Prefer `package:` imports over relative so moves are mechanical.
 
@@ -307,12 +308,12 @@ flowchart LR
   deploys (build+test only); deploys fire **only on `v*` tag creation**,
   gated by a tag ruleset (owner-level) + protected GitHub environment.
 - **GitHub Actions standard (uniform across repos, ratified 2026-07-18)**:
-  exactly two workflow families, identical names and shape in every repo —
+  two workflow families, identical names and shape in every repo —
   `.github/workflows/build-and-test.yml` (workflow name `build-and-test`;
   triggers `push: branches [main]` + `pull_request`, no path filters —
   surfaces join as jobs; `permissions: contents: read`; `concurrency:
   build-and-test-${{ github.ref }}` with cancel-in-progress; one job per
-  surface: `web` = "web · lint + typecheck + unit + build" on Node 22
+  surface: `web` = "web · lint + typecheck + unit + build" on Node 24
   (`npm ci → lint → typecheck → test → build`), `web-e2e` = "web ·
   Playwright (TEST_MODE)" (`playwright install --with-deps chromium →
   test:e2e`), api/mobile jobs follow the same naming pattern; action steps
@@ -320,18 +321,23 @@ flowchart LR
   `actions/checkout@v7`, `actions/setup-node@v7`,
   `actions/upload-artifact@v7` (verify via
   `gh api repos/actions/<name>/releases/latest` when touching workflows,
-  never copy stale versions from older files). **Shared jobs are
-  BYTE-IDENTICAL across repos** (2026-07-18: one canonical file, same
-  shasum in all three products) — repo variance lives in `package.json`
-  scripts, never in workflow YAML; named steps only (Checkout · Setup Node ·
+  never copy stale versions from older files). **Shared web jobs are
+  BYTE-IDENTICAL across repos** — repo variance lives in `package.json`
+  scripts, never in workflow YAML; a mobile product's file additionally
+  carries its mobile jobs (and the two ratified mobile workflows,
+  `mobile-goldens` dispatch + `mobile-e2e` nightly — see the Mobile
+  section); named steps only (Checkout · Setup Node ·
   Install dependencies · Lint · Typecheck · Unit & integration tests ·
   Build (TEST_MODE with `NEXT_PUBLIC_TEST_MODE: "1"`)); the e2e job builds
   in TEST_MODE, installs chromium, runs `test:e2e` with TEST_MODE+CI env,
   and uploads `web/playwright-report` as artifact `playwright-report`
   (retention 7) on failure) and the
   tag-gated `release.yml` (X-6; getpp/cueprise are the deploy-pattern
-  references). New workflow files beyond these two families are a standards
-  deviation and need ratification.
+  references — NOT YET LANDED in any product repo; lands with the deploy
+  phase). Workflow files beyond these families are a standards
+  deviation and need ratification. CodeQL runs via GitHub DEFAULT SETUP
+  (a repo setting, `gh api repos/<org>/<repo>/code-scanning/default-setup`),
+  not a workflow file — parity audits check the API, not `.github/`.
 - **Test layout standard (uniform across repos, 2026-07-18)**: unit/
   integration tests co-locate with their source as `<name>.test.ts(x)`
   (component `Button.test.tsx` beside `Button.tsx`; kebab for module tests);
@@ -339,6 +345,45 @@ flowchart LR
   the design.md §8.4 prototype journeys) with `playwright.config.ts` at the
   web root; npm scripts are `test` (unit), `test:e2e` (Playwright), `lint`,
   `typecheck` in every web app.
+- **Fleet parity canons (ratified 2026-07-23, cross-repo review)**:
+  - **Node 24 single-truth**: `setup-node` in CI, `web/.nvmrc`, the web
+    Dockerfile (`node:24-slim`), and the README prerequisite all say 24;
+    `@types/node` tracks the runtime major (`^24`). No repo states a
+    different floor anywhere.
+  - **Go single-truth**: one fleet Go version (currently `go 1.26` in
+    go.mod, `golang:1.26-alpine` images); service binaries build as
+    `app`; HEALTHCHECK `start-period` 10s (model-loading services may
+    extend — apparule measure 40s, upstat observability 30s — with the
+    reason in the Dockerfile).
+  - **Web dep alignment**: `next`/`react`/`react-dom`/`eslint-config-next`
+    are EXACT-pinned and fleet-identical; remaining shared devDeps stay
+    caret but version-aligned across repos; the dependabot npm `ignore`
+    block (eslint/typescript/@types/node majors) ships in every repo.
+  - **TEST_MODE web canon (extends the session-gate canon)**: provider
+    file is `web/src/auth/test-mode-provider.ts`, storage const
+    `SESSION_KEY`, key `<product>.test-session`, value = the JSON session
+    snapshot (never a bare sentinel; restore validates the payload,
+    treats missing/corrupt as signed_out, and re-resolves identity so
+    mutable account state is never served stale). Mock server lives at
+    `web/src/app/api/mock/v1/`, store at `web/src/mocks/store.ts`, seeds
+    at `web/src/mocks/seed.ts`, reset at `POST /api/mock/v1/testing/reset`.
+  - **Org lint bans fleet-wide**: `no-restricted-imports` blocks `@mui/*`,
+    `@emotion/*`, `dayjs`, `moment` (plus the legacy-path ban) in every
+    web app; `eslint-plugin-testing-library` is WIRED (flat/react preset
+    scoped to `src/**/*.test.{ts,tsx}`) with `no-container` and
+    `no-node-access` disabled via a documenting comment — bespoke
+    token-layer components assert non-semantic structure by design.
+  - **README fleet template**: badge row (License MIT + build-and-test
+    status) after the intro paragraph; prose overview; plain-indent repo
+    tree; `cp .env.example .env` + make-target quickstart; Node/Go
+    versions per the single-truths above. Root `.env.example` uses
+    `── section ──` comment headers; `web/.env.example` stays headerless.
+  - **next.config**: `devIndicators: { position: "bottom-right" }` — keep
+    the dev indicator, keep it out of content corners.
+  - **Changelog PR refs**: every entry carries its `(#NNN)` ref; a lane
+    writing entries pre-merge opens the PR first, then amends the entry
+    with the real number before handoff (refs are part of the entry, not
+    optional garnish).
 - Transactional email: **Brevo REST API** only (`BREVO_API_KEY/FROM_EMAIL/
   FROM_NAME` via Doppler; irealty is the reference) — **no SMTP** in any
   CueLABS™ product.
@@ -1197,8 +1242,8 @@ org canon.
   generated l10n is gitignored (regenerates on pub get).
 - **MOCK-FIRST (TEST_MODE parity)**: every repository is abstract with
   `*Remote` and `*Fake` implementations; fakes read seeded narrative
-  JSON from dev-flavor-scoped `assets/seed/`; per-flavor entrypoints
-  (`main_dev/stg/main.dart`) pick the provider-override set. API wiring
+  JSON from dev-flavor-scoped `assets/seed/dev/`; per-flavor entrypoints
+  (`main_dev.dart`/`main.dart`) pick the provider-override set. API wiring
   lands LAST behind unchanged repository interfaces.
 - **Interaction-integrity locks (mobile audit 2026-07-22 — 72 defects,
   8 classes; lock the class, not the instance)**: (1) STALE SIBLINGS —
@@ -1301,8 +1346,11 @@ org canon.
   FractionallySizedBox at heightFactor 0 reports an infinite max
   intrinsic (child ÷ 0) and crashes the row on frame one (found live:
   the MI-14 connector draw inside the C8 timeline rows).
-  CI: format check, codegen-fresh, analyze --fatal-infos + custom_lint,
-  test --coverage with a gate, apk/ipa build matrix on main.
+  CI: format check, codegen-fresh, `analyze --fatal-infos` (riverpod_lint
+  diagnostics ride the native analyze — no custom_lint), `flutter test`
+  (coverage gate deferred to a later wave), plus an unsigned iOS-simulator
+  dev-flavor build on every PR; an apk/ipa release matrix lands with the
+  deploy phase.
 - **Hygiene**: flavors mirror the ORG ENVIRONMENT MODEL, not the
   generic trio — CueLABS has one real environment (the sandbox account
   IS production, user directive 2026-07-22), so mobile ships exactly
@@ -1311,8 +1359,9 @@ org canon.
   exists (applicationIdSuffix + iOS schemes, `appFlavor` constant,
   flavor-scoped assets); secrets via
   `--dart-define-from-file=env/<flavor>.json` generated from Doppler,
-  gitignored — never envied/obfuscation as security; gen-l10n with
-  `synthetic-package: false` (flutter_gen removed in current Flutter);
+  gitignored — never envied/obfuscation as security; gen-l10n outputs
+  into `lib/` (the `synthetic-package` key is removed upstream — do not
+  write it into l10n.yaml);
   native projects live INSIDE the flutter root; icons/splash via
   flutter_launcher_icons + flutter_native_splash per flavor;
   `version: x.y.z+build` — humans own x.y.z, CI stamps build number.

@@ -1,19 +1,22 @@
-# CueLABS Engineering Standards
+# CueLABS™ Engineering Standards
 
-The canonical repository standard for CueLABS projects, packaged as a skill for
+The canonical repository standard for CueLABS™ projects, packaged as a skill for
 coding agents.
 
 ## What this is
 
-This repository defines how CueLABS repositories are structured and provides the
+This repository defines how CueLABS™ repositories are structured and provides the
 reusable files to achieve it:
 
 - **[`SKILL.md`](SKILL.md)** — the standard and the procedures (bootstrap a new
   repo; standardize an existing one), for a coding agent to follow.
 - **[`templates/`](templates/)** — reusable file templates: community-health
-  files, a `dependabot.example.yml`, and issue/PR templates. Dotfile templates
-  are stored without the leading dot (copy `gitignore` → `.gitignore`,
-  `dockerignore.root` → `.dockerignore`, `editorconfig` → `.editorconfig`).
+  files, a `dependabot.example.yml`, issue/PR templates, Docker
+  (`Dockerfile.{go,web,python}`, `docker-compose.example.yml`,
+  `dockerignore.*`), `env.example`, and `helm/` + `terraform/` deploy
+  skeletons. Dotfile templates are stored without the leading dot (copy
+  `gitignore` → `.gitignore`, `dockerignore.root` → `.dockerignore`,
+  `editorconfig` → `.editorconfig`).
 
 The reference implementation of the standard is **cuesoftinc/apparule**.
 
