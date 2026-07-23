@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Multi-skill v2 catalog with focused repository, web, mobile, delivery, and
+  design skills; progressive-disclosure references; Codex UI metadata; base and
+  CueLABS profiles; a project-manifest schema; trigger evaluations; official
+  validation CI; and a dependency-free `audit / plan / apply / verify` tool
+  (#137).
+- Public adoption, compatibility, governance, and v2 migration documentation
+  with one-command Codex and Cursor installation (#137).
+- Baseline CLI regression coverage for installed resource resolution, manifest
+  authority and validation, shared-file drift, ordered plans, path collisions,
+  and idempotent application (#137).
+
 - `SKILL.md`: fleet parity canons from the 2026-07-23 cross-repo review —
   Node 24 single-truth (CI + .nvmrc + image + README), Go single-truth
   (1.26, `app` binary, 10s health start-period), exact-pinned and
@@ -87,6 +98,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   CueLABS repositories.
 
 ### Changed
+
+- Repackaged the root `SKILL.md` handbook into
+  `skills/<skill-name>/SKILL.md` packages. Existing canon remains available in
+  focused references, while templates now live in the primary skill's
+  `assets/templates/` directory (#137).
 
 - `SKILL.md` and shared templates: preserve canonical GitHub Actions workflows,
   defer standardized backend jobs until each backend is build-ready, reconcile

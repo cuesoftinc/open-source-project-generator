@@ -1,0 +1,4 @@
+interface:
+  display_name: "CueLABS Mobile Standard"
+  short_description: "Build and review CueLABS Flutter apps"
+  default_prompt: "Use $cuelabs-mobile-standard to implement or audit this CueLABS mobile app."

@@ -76,6 +76,6 @@ spec:
       volumes:
         - name: envoy-config
           configMap:
-            name: {{ $.Chart.Name }}-envoy-config
+            name: {{ $name }}-envoy-config
       {{- end }}
 {{- end }}

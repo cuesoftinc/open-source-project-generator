@@ -1,0 +1,45 @@
+name: validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  catalog:
+    name: catalog · structure + evals
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate catalog
+        run: python3 scripts/validate_catalog.py
+
+      - name: Test baseline CLI
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Exercise CLI
+        run: |
+          python3 skills/cuelabs-engineering-standards/scripts/cuelabs_standard.py audit --repo .
+          python3 skills/cuelabs-engineering-standards/scripts/cuelabs_standard.py plan --repo .
+
+  specification:
+    name: catalog · Agent Skills specification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate without publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh skill publish --dry-run
