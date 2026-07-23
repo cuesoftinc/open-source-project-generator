@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-23
+
+### Fixed
+
+- Audit: the root `.env.example` is seeded, never byte-compared — the canon
+  fixes its variable names and section format while values and
+  product-specific sections diverge per repository, so customization no
+  longer reads as shared-file drift (which kept every adopter at
+  "Baseline conforming: no").
+- The repository's own `SECURITY.md` now carries the published reporting
+  policy (private vulnerability reporting, dedicated security mailbox).
+- Changelog cut into released sections — v2.0.0 shipped with all entries
+  still under Unreleased; adoption docs now also state that the catalog
+  repository itself is not a manifest-carrying adopter.
+
+## [2.0.0] - 2026-07-23
+
 ### Added
 
 - Multi-skill v2 catalog with focused repository, web, mobile, delivery, and
