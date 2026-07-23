@@ -41,7 +41,9 @@ to change, fix, bootstrap, or standardize the repository.
   `assets/profiles/cuelabs.yaml` for CueLABS-specific policy.
 - Validate `.cuelabs/project.yaml` against
   `assets/schema/project.schema.json`.
-- Use `assets/templates/` as the source for shared repository files.
+- Use `assets/templates/` as the source for profile-managed repository files.
+  For `base`, preserve repository-authored ownership, licensing,
+  community-health, and application files; do not substitute CueLABS identity.
 
 For a focused surface, activate the matching installed skill:
 

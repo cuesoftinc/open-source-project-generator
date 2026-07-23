@@ -18,25 +18,42 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_ROOT = SKILL_ROOT / "assets" / "templates"
 PROJECT_SCHEMA = SKILL_ROOT / "assets" / "schema" / "project.schema.json"
 
-BASE_TEMPLATE_TARGETS = {
+PORTABLE_TEMPLATE_TARGETS = {
+    "gitignore": ".gitignore",
+    "editorconfig": ".editorconfig",
+}
+
+CUELABS_TEMPLATE_TARGETS = {
+    **PORTABLE_TEMPLATE_TARGETS,
     "CODEOWNERS": "CODEOWNERS",
     "CODE_OF_CONDUCT.md": "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md": "CONTRIBUTING.md",
     "LICENSE": "LICENSE",
     "SECURITY.md": "SECURITY.md",
-    "gitignore": ".gitignore",
-    "editorconfig": ".editorconfig",
     "PULL_REQUEST_TEMPLATE.md": ".github/PULL_REQUEST_TEMPLATE.md",
     "ISSUE_TEMPLATE/bug_report.md": ".github/ISSUE_TEMPLATE/bug_report.md",
     "ISSUE_TEMPLATE/config.yml": ".github/ISSUE_TEMPLATE/config.yml",
     "ISSUE_TEMPLATE/feature_request.md": ".github/ISSUE_TEMPLATE/feature_request.md",
 }
 
-APPLICATION_TEMPLATE_TARGETS = {
+CUELABS_APPLICATION_TEMPLATE_TARGETS = {
     "Makefile": "Makefile",
     "dockerignore.root": ".dockerignore",
     "env.example": ".env.example",
 }
+
+PORTABLE_REPOSITORY_FILES = [
+    "CODEOWNERS",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "SECURITY.md",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/ISSUE_TEMPLATE/bug_report.md",
+    ".github/ISSUE_TEMPLATE/config.yml",
+    ".github/ISSUE_TEMPLATE/feature_request.md",
+]
+PORTABLE_APPLICATION_FILES = ["Makefile", ".dockerignore", ".env.example"]
 
 STATUSES = {"active", "planned", "paused", "absent"}
 
@@ -312,9 +329,14 @@ def validate_manifest_data(data: dict[str, Any]) -> list[str]:
                     errors.append(f"{prefix}.expires must be a date or null")
                 else:
                     try:
-                        date.fromisoformat(expires)
+                        expiration = date.fromisoformat(expires)
                     except ValueError:
                         errors.append(f"{prefix}.expires must use YYYY-MM-DD")
+                    else:
+                        if expiration < date.today():
+                            errors.append(
+                                f"{prefix}.expires has passed ({expiration.isoformat()})"
+                            )
     return errors
 
 
@@ -373,20 +395,30 @@ def find_collision(repo: Path, destination_name: str) -> str | None:
     destination = repo / destination_name
     current = destination.parent
     while current != repo:
-        if current.exists() and not current.is_dir():
+        if current.is_symlink() or (current.exists() and not current.is_dir()):
             return destination_name
         current = current.parent
-    if destination.exists() and not destination.is_file():
+    if destination.is_symlink() or (
+        destination.exists() and not destination.is_file()
+    ):
         return destination_name
     return None
 
 
-def required_targets(surfaces: dict[str, str]) -> dict[str, str]:
-    targets = dict(BASE_TEMPLATE_TARGETS)
-    if any(
+def has_active_application(surfaces: dict[str, str]) -> bool:
+    return any(
         surfaces.get(name) == "active" for name in ("web", "go-api", "flutter")
-    ):
-        targets.update(APPLICATION_TEMPLATE_TARGETS)
+    )
+
+
+def required_targets(profile: str, surfaces: dict[str, str]) -> dict[str, str]:
+    targets = dict(
+        CUELABS_TEMPLATE_TARGETS
+        if profile == "cuelabs"
+        else PORTABLE_TEMPLATE_TARGETS
+    )
+    if profile == "cuelabs" and has_active_application(surfaces):
+        targets.update(CUELABS_APPLICATION_TEMPLATE_TARGETS)
     return targets
 
 
@@ -403,7 +435,7 @@ def inspect(repo: Path) -> Audit:
     else:
         surfaces = inferred
 
-    targets = required_targets(surfaces)
+    targets = required_targets(manifest.profile, surfaces)
     missing_shared: list[str] = []
     drifted_shared: list[str] = []
     collisions: list[str] = []
@@ -423,7 +455,11 @@ def inspect(repo: Path) -> Audit:
             drifted_shared.append(destination_name)
 
     repository_specific = ["README.md", "CHANGELOG.md"]
-    if any(surfaces.get(name) == "active" for name in ("web", "go-api", "flutter")):
+    if manifest.profile != "cuelabs":
+        repository_specific.extend(PORTABLE_REPOSITORY_FILES)
+        if has_active_application(surfaces):
+            repository_specific.extend(PORTABLE_APPLICATION_FILES)
+    if has_active_application(surfaces):
         repository_specific.append(".github/dependabot.yml")
     missing_specific = sorted(
         path for path in repository_specific if not (repo / path).is_file()
@@ -576,12 +612,16 @@ def emit_plan(audit: Audit, output_format: str) -> None:
 
 def apply_missing(repo: Path) -> list[str]:
     audit = inspect(repo)
+    if audit.manifest == "missing":
+        raise ManifestError(
+            "required project manifest is missing: .cuelabs/project.yaml"
+        )
     if audit.manifest == "invalid":
         raise ManifestError("; ".join(audit.manifest_errors))
     if audit.blocking_collisions:
         raise BlockingCollision(audit.blocking_collisions)
     copied: list[str] = []
-    targets = required_targets(audit.surfaces)
+    targets = required_targets(audit.profile, audit.surfaces)
     for source_name, destination_name in targets.items():
         source = TEMPLATE_ROOT / source_name
         destination = repo / destination_name

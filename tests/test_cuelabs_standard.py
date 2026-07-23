@@ -4,6 +4,7 @@ import importlib.util
 import sys
 import tempfile
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 
 
@@ -33,13 +34,15 @@ class StandardsCliTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp.cleanup()
 
-    def write_manifest(self, surfaces: str = "  web: active\n") -> None:
+    def write_manifest(
+        self, surfaces: str = "  web: active\n", *, profile: str = "cuelabs"
+    ) -> None:
         manifest = self.repo / ".cuelabs" / "project.yaml"
         manifest.parent.mkdir()
         manifest.write_text(
             "schemaVersion: 1\n"
             "name: fixture\n"
-            "profile: cuelabs\n"
+            f"profile: {profile}\n"
             "surfaces:\n"
             f"{surfaces}"
             "capabilities: {}\n"
@@ -47,10 +50,11 @@ class StandardsCliTest(unittest.TestCase):
             "deviations: []\n"
         )
 
-    def copy_required_templates(self, *, application: bool) -> None:
-        targets = dict(standard.BASE_TEMPLATE_TARGETS)
-        if application:
-            targets.update(standard.APPLICATION_TEMPLATE_TARGETS)
+    def copy_required_templates(
+        self, *, application: bool, profile: str = "cuelabs"
+    ) -> None:
+        surfaces = {"web": "active" if application else "absent"}
+        targets = standard.required_targets(profile, surfaces)
         for source_name, destination_name in targets.items():
             source = standard.TEMPLATE_ROOT / source_name
             destination = self.repo / destination_name
@@ -72,6 +76,7 @@ class StandardsCliTest(unittest.TestCase):
         self.assertTrue(audit.conforming)
 
     def test_shared_file_drift_fails_conformance(self) -> None:
+        self.write_manifest("  web: absent\n")
         self.copy_required_templates(application=False)
         (self.repo / "LICENSE").write_text("not the canonical license\n")
 
@@ -106,6 +111,7 @@ class StandardsCliTest(unittest.TestCase):
         self.assertTrue(any(step.mode == "manual" for step in plan))
 
     def test_apply_rejects_directory_collision(self) -> None:
+        self.write_manifest("  web: absent\n")
         self.copy_required_templates(application=False)
         (self.repo / "CODEOWNERS").unlink()
         (self.repo / "CODEOWNERS").mkdir()
@@ -116,6 +122,7 @@ class StandardsCliTest(unittest.TestCase):
         self.assertIn("CODEOWNERS", context.exception.collisions)
 
     def test_apply_is_idempotent_and_preserves_existing_files(self) -> None:
+        self.write_manifest("  web: absent\n")
         first = standard.apply_missing(self.repo)
         second = standard.apply_missing(self.repo)
 
@@ -135,15 +142,82 @@ class StandardsCliTest(unittest.TestCase):
             "deviations:\n"
             "  - id: EX-1\n"
             "    reason: Intentional exception\n"
-            "    expires: 2026-12-31\n"
+            f"    expires: {(date.today() + timedelta(days=30)).isoformat()}\n"
         )
-        self.copy_required_templates(application=False)
+        self.copy_required_templates(application=False, profile="base")
+        for path in standard.PORTABLE_REPOSITORY_FILES:
+            destination = self.repo / path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(f"fixture-owned {path}\n")
 
         audit = standard.inspect(self.repo)
 
         self.assertEqual(audit.manifest, "valid")
         self.assertEqual(audit.manifest_errors, [])
         self.assertTrue(audit.conforming)
+
+    def test_apply_requires_manifest_before_modifying_active_product(self) -> None:
+        (self.repo / "web").mkdir()
+        (self.repo / "web" / "package.json").write_text('{"name":"fixture"}\n')
+
+        with self.assertRaises(standard.ManifestError):
+            standard.apply_missing(self.repo)
+
+        self.assertFalse((self.repo / "Makefile").exists())
+        self.assertFalse((self.repo / ".github").exists())
+
+    def test_base_profile_preserves_repository_identity_files(self) -> None:
+        self.write_manifest("  web: absent\n", profile="base")
+        self.copy_required_templates(application=False, profile="base")
+        repository_content = {
+            path: f"external project content for {path}\n"
+            for path in standard.PORTABLE_REPOSITORY_FILES
+        }
+        for path, content in repository_content.items():
+            destination = self.repo / path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(content)
+
+        audit = standard.inspect(self.repo)
+        copied = standard.apply_missing(self.repo)
+
+        self.assertTrue(audit.conforming)
+        self.assertEqual(copied, [])
+        for path, content in repository_content.items():
+            self.assertEqual((self.repo / path).read_text(), content)
+
+    def test_expired_deviation_invalidates_manifest(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_text(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: base\n"
+            "surfaces:\n"
+            "  web: absent\n"
+            "deviations:\n"
+            "  - id: EX-1\n"
+            "    reason: Expired exception\n"
+            f"    expires: {(date.today() - timedelta(days=1)).isoformat()}\n"
+        )
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "invalid")
+        self.assertTrue(any("has passed" in error for error in audit.manifest_errors))
+        with self.assertRaises(standard.ManifestError):
+            standard.apply_missing(self.repo)
+
+    def test_apply_rejects_symlinked_template_parent(self) -> None:
+        self.write_manifest("  web: absent\n")
+        with tempfile.TemporaryDirectory() as outside_dir:
+            outside = Path(outside_dir)
+            (self.repo / ".github").symlink_to(outside, target_is_directory=True)
+
+            with self.assertRaises(standard.BlockingCollision):
+                standard.apply_missing(self.repo)
+
+            self.assertFalse((outside / "PULL_REQUEST_TEMPLATE.md").exists())
 
 
 if __name__ == "__main__":

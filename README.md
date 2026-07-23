@@ -102,13 +102,18 @@ python3 skills/cuelabs-engineering-standards/scripts/cuelabs_standard.py \
 ```
 
 Available operations are `audit`, `plan`, `apply`, and `verify`. `apply` copies
-only missing shared files; it never overwrites existing files.
+only missing profile-managed files; it never overwrites existing files or
+writes through symlinked paths.
 
 ## Profiles and project state
 
 - `base` contains portable open-source engineering defaults.
 - `cuelabs` layers CueLABS™ identity, platform, delivery, and observability
   decisions over the base.
+- The portable profile manages only neutral shared defaults automatically.
+  Ownership, licensing, community-health, and application files remain
+  repository-authored and are checked for presence without enforcing CueLABS
+  content.
 - Each product owns its current state in `.cuelabs/project.yaml`; the standards
   repository defines the schema, not whether a product backend or mobile app is
   currently ready.
