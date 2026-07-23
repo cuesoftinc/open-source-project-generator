@@ -207,7 +207,7 @@ def parse_yaml_block(
             elif index < len(tokens) and tokens[index][0] > indent:
                 entry[key], index = parse_yaml_block(tokens, index, tokens[index][0])
             else:
-                entry[key] = {}
+                entry[key] = None
             if index < len(tokens) and tokens[index][0] > indent:
                 continuation, index = parse_yaml_block(tokens, index, tokens[index][0])
                 if not isinstance(continuation, dict):
@@ -234,7 +234,7 @@ def parse_yaml_block(
         elif index < len(tokens) and tokens[index][0] > indent:
             container[key], index = parse_yaml_block(tokens, index, tokens[index][0])
         else:
-            container[key] = {}
+            container[key] = None
     return container, index
 
 

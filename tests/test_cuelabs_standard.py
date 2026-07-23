@@ -257,6 +257,26 @@ class StandardsCliTest(unittest.TestCase):
             any("must use YYYY-MM-DD" in error for error in audit.manifest_errors)
         )
 
+    def test_empty_deviation_expiry_is_yaml_null(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_text(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces:\n"
+            "  web: absent\n"
+            "deviations:\n"
+            "  - id: EX-1\n"
+            "    reason: Non-expiring exception\n"
+            "    expires:\n"
+        )
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "valid")
+        self.assertIsNone(audit.active_deviations[0]["expires"])
+
     def test_nested_backend_status_activates_application_requirements(self) -> None:
         self.write_manifest("  backend:\n    go: active\n")
         self.copy_required_templates(application=True)
@@ -312,6 +332,60 @@ class StandardsCliTest(unittest.TestCase):
                 standard.apply_missing(self.repo)
 
             self.assertFalse((outside / "PULL_REQUEST_TEMPLATE.md").exists())
+
+    def test_web_dockerfile_creates_optional_public_directory(self) -> None:
+        dockerfile = (standard.TEMPLATE_ROOT / "Dockerfile.web").read_text()
+
+        create = dockerfile.index("RUN mkdir -p public")
+        build = dockerfile.index("RUN npm run build")
+        copy = dockerfile.index("COPY --from=builder /app/public ./public")
+        self.assertLess(create, build)
+        self.assertLess(build, copy)
+
+    def test_helm_envoy_configmap_matches_deployment_volume(self) -> None:
+        templates = standard.TEMPLATE_ROOT / "helm" / "templates"
+        configmap = (templates / "envoy-configmap.yaml").read_text()
+        deployment = (templates / "deployment.yaml").read_text()
+
+        self.assertIn("kind: ConfigMap", configmap)
+        self.assertIn("name: {{ $name }}-envoy-config", configmap)
+        self.assertIn("$.Files.Get $svc.envoyConfig", configmap)
+        self.assertIn("name: {{ $name }}-envoy-config", deployment)
+
+    def test_helm_envoy_configmap_renders(self) -> None:
+        helm = shutil.which("helm")
+        if helm is None:
+            self.skipTest("helm is not installed")
+        chart = self.repo / "chart"
+        shutil.copytree(standard.TEMPLATE_ROOT / "helm", chart)
+        (chart / "Chart.yaml").write_text(
+            (chart / "Chart.example.yaml")
+            .read_text()
+            .replace("name: REPO", "name: fixture")
+            .replace("for REPO", "for fixture")
+        )
+        (chart / "values.yaml").write_text(
+            "replicaCount: 1\n"
+            "services:\n"
+            "  envoy:\n"
+            "    image: envoyproxy/envoy:v1.31-latest\n"
+            "    port: 8080\n"
+            "    envoyConfig: envoy/envoy.yaml\n"
+        )
+        envoy = chart / "envoy" / "envoy.yaml"
+        envoy.parent.mkdir()
+        envoy.write_text("static_resources: {}\n")
+
+        result = subprocess.run(
+            [helm, "template", "fixture", str(chart)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertIn("kind: ConfigMap", result.stdout)
+        self.assertIn("name: envoy-envoy-config", result.stdout)
+        self.assertIn("static_resources: {}", result.stdout)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,15 @@
+{{- range $name, $svc := .Values.services }}
+{{- if $svc.envoyConfig }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-envoy-config
+  labels:
+    {{- include "chart.selectorLabels" (dict "name" $name "root" $) | nindent 4 }}
+    {{- include "chart.labels" $ | nindent 4 }}
+data:
+  envoy.yaml: |
+{{ $.Files.Get $svc.envoyConfig | nindent 4 }}
+{{- end }}
+{{- end }}
