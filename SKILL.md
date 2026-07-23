@@ -1334,6 +1334,20 @@ org canon.
   worktrees: cleaned at the GATE, never left for the disk-full crisis
   — the host has hit zero three times from accumulated regenerable
   build state.
+- **Mobile E2E lane canon (proven 2026-07-23, apparule #168)**:
+  patrol_finders over the SDK's integration_test; smoke journeys
+  assert USER-VISIBLE outcomes only (screens reached, data shown);
+  the lane runs nightly + workflow_dispatch, NEVER per-PR (cost);
+  runner shape: ubuntu + KVM enable + temurin (AGP-matched) +
+  flutter-action (.fvmrc pin) + reactivecircus/android-emulator-runner
+  (default target — no Play services with fakes). New dispatch-only
+  workflows are PROVEN pre-merge via a TEMP branch-push trigger
+  commit, reverted once green — never merged unproven. GOTCHA: never
+  use enterText/IME injection in ON-DEVICE integration tests — the
+  live binding never registers TestTextInput, so injected text rides
+  a debug path that silently fails to commit against the real IME;
+  drive pointer gestures instead (typed-entry coverage stays in
+  widget tests).
 - **Legacy quarantine (user directive 2026-07-21, carried from web)**:
   superseded mobile code is NEVER deleted up front — it moves
   structure-preserved into `lib/legacy/` (assets to `assets/legacy/`,
