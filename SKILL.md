@@ -304,9 +304,15 @@ flowchart LR
   API keys in cloud deployments. Self-host fallback: BYO Gemini/Groq env keys.
 - Environments & deploy gating: `stg` = sandbox is the ONLY environment for
   CueLABS™ products (no production); Doppler config `stg` holds its secrets.
-  **Open-source deviation from the cueprise flow**: merge-to-main never
-  deploys (build+test only); deploys fire **only on `v*` tag creation**,
-  gated by a tag ruleset (owner-level) + protected GitHub environment.
+  **Open-source deviation from the cueprise flow**, scoped by surface:
+  the WEBSITES ride Firebase App Hosting automatic rollouts from `main`
+  (declared in cuesoft-iac `Pulumi.cuesoft.yaml` appHosting backends,
+  `rootDirectory: /web`, Cloudflare-proxied; a web-visible merge is live
+  in ~30 min — verified 2026-07-23). API-SERVICE deploys are the
+  tag-gated path: they fire **only on `v*` tag creation**, gated by a
+  tag ruleset (owner-level) + protected GitHub environment, via the
+  pending `release.yml` (lands with the deploy phase). GitHub Actions
+  itself never deploys the sites.
 - **GitHub Actions standard (uniform across repos, ratified 2026-07-18)**:
   two workflow families, identical names and shape in every repo —
   `.github/workflows/build-and-test.yml` (workflow name `build-and-test`;
@@ -383,7 +389,10 @@ flowchart LR
   - **Changelog PR refs**: every entry carries its `(#NNN)` ref; a lane
     writing entries pre-merge opens the PR first, then amends the entry
     with the real number before handoff (refs are part of the entry, not
-    optional garnish).
+    optional garnish). Entries are APPENDED INTO the section's existing
+    bucket heading — emitting a second `### Added`/`### Fixed` heading is
+    the defect that forced dedup rounds in every repo (apparule twice);
+    grep for an existing heading before writing one.
 - Transactional email: **Brevo REST API** only (`BREVO_API_KEY/FROM_EMAIL/
   FROM_NAME` via Doppler; irealty is the reference) — **no SMTP** in any
   CueLABS™ product.
@@ -793,7 +802,9 @@ How each product's `web/` app is built (ratified 2026-07-18):
 - **Tests** — Vitest + Testing Library for unit/integration (components,
   controllers, mock handlers); Playwright e2e mirrors the design.md §8.4
   prototype journeys, run in TEST_MODE against the mock server. Both wire
-  into CI build+test (X-6: merge-to-main never deploys).
+  into CI build+test (X-6: Actions never deploys — though note the
+  websites separately ride FAH auto-rollouts from `main`, so a green
+  merge IS user-visible within the hour).
 - **Legacy / dead-code quarantine** — before replacement, legacy trees are
   `git mv`-ed into `web/src/legacy/` (structure preserved, excluded from
   build & routing); live paths carry **zero dead code**. Once the
