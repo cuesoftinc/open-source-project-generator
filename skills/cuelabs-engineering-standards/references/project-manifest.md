@@ -22,7 +22,7 @@ local shells.
 Do not use anchors, aliases, tags, merge keys, directives, document markers,
 complex keys, quoted block-mapping keys, tabs for indentation, multi-document
 streams, or multi-line plain strings. Quote a plain string when it begins with
-a reserved YAML indicator.
+a reserved YAML indicator or contains ` &`, ` *`, or ` !` at a token boundary.
 
 These exclusions are part of the manifest format, not missing parser features.
 The bundled CLI rejects them with an actionable error. The JSON Schema defines

@@ -375,6 +375,16 @@ def unsupported_yaml_indicator(content: str) -> str | None:
                 quote = None
         elif character in {"'", '"'}:
             quote = character
+        elif (
+            content.startswith("<<", index)
+            and (
+                index == 0
+                or content[index - 1].isspace()
+                or content[index - 1] in "[{,"
+            )
+            and re.match(r"<<\s*:", content[index:])
+        ):
+            return "merge keys"
         elif character in {"&", "*", "!"} and (
             index == 0
             or content[index - 1].isspace()
@@ -405,10 +415,6 @@ def validate_yaml_subset_syntax(text: str) -> None:
         if content.startswith("?"):
             raise ManifestError(
                 f"line {line_number}: complex YAML keys are not supported"
-            )
-        if re.match(r"(?:-\s+)?<<\s*:", content):
-            raise ManifestError(
-                f"line {line_number}: YAML merge keys are not supported"
             )
         indicator = unsupported_yaml_indicator(content)
         if indicator is not None:

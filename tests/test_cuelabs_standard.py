@@ -207,7 +207,7 @@ class StandardsCliTest(unittest.TestCase):
             "anchors": "value: &shared active\n",
             "aliases": "value: *shared\n",
             "tags": "value: !custom active\n",
-            "merge keys": "<<: { web: active }\n",
+            "merge keys": "value: { <<: { web: active } }\n",
             "directives": "%YAML 1.2\nvalue: active\n",
             "document markers": "---\nvalue: active\n",
             "complex YAML keys": "? [web, active]\n: value\n",
@@ -220,12 +220,12 @@ class StandardsCliTest(unittest.TestCase):
 
     def test_reserved_yaml_indicators_inside_strings_are_preserved(self) -> None:
         data = standard.parse_yaml_subset(
-            'reason: "Use &shared, *alias, and !tag as literal text"\n'
+            'reason: "Use &shared, *alias, !tag, and <<: as literal text"\n'
         )
 
         self.assertEqual(
             data["reason"],
-            "Use &shared, *alias, and !tag as literal text",
+            "Use &shared, *alias, !tag, and <<: as literal text",
         )
 
     def test_apply_requires_manifest_before_modifying_active_product(self) -> None:
