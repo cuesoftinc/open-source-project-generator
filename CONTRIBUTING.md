@@ -1,6 +1,6 @@
 # Contributing
 
-This repository holds the CueLABS engineering standard as a skill for coding
+This repository holds the CueLABS™ engineering standard as a skill for coding
 agents ([`SKILL.md`](SKILL.md)) plus reusable file [`templates/`](templates/).
 
 ## How to contribute

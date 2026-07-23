@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md`: fleet parity canons from the 2026-07-23 cross-repo review —
+  Node 24 single-truth (CI + .nvmrc + image + README), Go single-truth
+  (1.26, `app` binary, 10s health start-period), exact-pinned and
+  fleet-aligned web deps with the org dependabot ignore block, the
+  TEST_MODE web canon (provider/store/seed/reset naming and the
+  JSON-session-snapshot rule), org lint bans + wired testing-library
+  preset, the README fleet template with badge row, bottom-right
+  dev indicators, and changelog-PR-ref amendment procedure (#133).
+
 - `SKILL.md` mobile standard: the repeating-MI test canon — screens hosting
   repeating MI primitives run their wiring suites and seeded goldens under
   the platform reduced-motion flag (motion stays covered by the primitives'
@@ -78,6 +87,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   CueLABS repositories.
 
 ### Changed
+
+- `SKILL.md` self-consistency pass (found by the standards self-audit):
+  the pre-canon Flutter tree block now points at the feature-first mobile
+  standard; mobile CI described as it ships (native riverpod_lint on
+  analyze, no custom_lint; coverage gate deferred; per-PR unsigned
+  iOS-simulator build); the removed upstream `synthetic-package` key is
+  no longer instructed; `release.yml` marked not-yet-landed; the
+  byte-identical CI claim scoped to the shared web jobs with the mobile
+  workflows noted; `stg` dropped from the entrypoint example; CodeQL
+  documented as GitHub default setup (API-checked, not a workflow file) (#133).
+
+- `README.md`: templates description covers the Docker/env/helm/terraform
+  templates; CueLABS™ brand mark applied in README and CONTRIBUTING (#133).
 
 - `SKILL.md` mobile standard: platform floors & flavor plumbing (iOS 15 with
   Firebase 12, flutter-tool-only builds, load-bearing flavor config naming,
