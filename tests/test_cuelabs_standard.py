@@ -250,6 +250,20 @@ class StandardsCliTest(unittest.TestCase):
                 ):
                     standard.parse_yaml_subset(f"reason: {value}\n")
 
+    def test_reserved_plain_colon_and_lone_single_quote_are_rejected(self) -> None:
+        with self.assertRaisesRegex(standard.ManifestError, "reserved YAML colon"):
+            standard.parse_yaml_subset("reason: key: value\n")
+        with self.assertRaisesRegex(standard.ManifestError, "reserved YAML colon"):
+            standard.parse_yaml_subset("value: { reason: key: value }\n")
+        with self.assertRaisesRegex(
+            standard.ManifestError,
+            "internal quotes must be doubled",
+        ):
+            standard.parse_yaml_subset("reason: 'owner's note'\n")
+
+        data = standard.parse_yaml_subset("reason: 'owner''s note'\n")
+        self.assertEqual(data["reason"], "owner's note")
+
     def test_apply_requires_manifest_before_modifying_active_product(self) -> None:
         (self.repo / "web").mkdir()
         (self.repo / "web" / "package.json").write_text('{"name":"fixture"}\n')

@@ -113,7 +113,9 @@ class PlanStep:
     reason: str
 
 
-def split_flow_items(value: str, delimiter: str) -> list[str]:
+def split_flow_items(
+    value: str, delimiter: str, *, maxsplit: int | None = None
+) -> list[str]:
     items: list[str] = []
     start = 0
     stack: list[str] = []
@@ -147,7 +149,11 @@ def split_flow_items(value: str, delimiter: str) -> list[str]:
             expected = "[" if character == "]" else "{"
             if not stack or stack.pop() != expected:
                 raise ManifestError("unbalanced flow collection")
-        elif character == delimiter and not stack:
+        elif (
+            character == delimiter
+            and not stack
+            and (maxsplit is None or len(items) < maxsplit)
+        ):
             items.append(value[start:index].strip())
             start = index + 1
         index += 1
@@ -159,10 +165,10 @@ def split_flow_items(value: str, delimiter: str) -> list[str]:
 
 
 def split_flow_mapping_entry(value: str) -> tuple[str, str]:
-    parts = split_flow_items(value, ":")
-    if len(parts) < 2:
+    parts = split_flow_items(value, ":", maxsplit=1)
+    if len(parts) != 2:
         raise ManifestError(f"expected a key-value pair in flow mapping: {value!r}")
-    return parts[0], ":".join(parts[1:]).strip()
+    return parts[0], parts[1]
 
 
 def parse_flow_collection(value: str) -> Any:
@@ -216,7 +222,21 @@ def parse_scalar(value: str) -> Any:
         except json.JSONDecodeError as error:
             raise ManifestError(f"invalid quoted scalar: {error}") from error
     if len(value) >= 2 and value[0] == value[-1] == "'":
-        return value[1:-1].replace("''", "'")
+        inner = value[1:-1]
+        decoded = ""
+        index = 0
+        while index < len(inner):
+            if inner[index] != "'":
+                decoded += inner[index]
+                index += 1
+                continue
+            if index + 1 >= len(inner) or inner[index + 1] != "'":
+                raise ManifestError(
+                    "invalid single-quoted scalar: internal quotes must be doubled"
+                )
+            decoded += "'"
+            index += 2
+        return decoded
     if (
         value[0] in ",[]{}#&*!|>'\"%@`"
         or (
@@ -226,6 +246,11 @@ def parse_scalar(value: str) -> Any:
     ):
         raise ManifestError(
             f"plain scalar {value!r} begins with a reserved YAML indicator; "
+            "quote the value"
+        )
+    if re.search(r":(?:\s|$)", value):
+        raise ManifestError(
+            f"plain scalar {value!r} contains a reserved YAML colon; "
             "quote the value"
         )
     return value
