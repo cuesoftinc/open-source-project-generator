@@ -88,6 +88,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md` and shared templates: preserve canonical GitHub Actions workflows,
+  defer standardized backend jobs until each backend is build-ready, reconcile
+  the canonical Next.js tree, make gRPC a fleet-standard transport option, and
+  add byte-identical mobile-ready Makefile + generated-client Prettier-ignore
+  templates for every product (#136).
+
 - `SKILL.md`: deploy truth reconciled by surface — websites ride Firebase
   App Hosting automatic rollouts from `main` (cuesoft-iac appHosting;
   live in ~30 min, verified), while API-service deploys stay tag-gated
