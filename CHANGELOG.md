@@ -88,6 +88,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md`: the Recommended-versions Go row reconciled to the Go
+  single-truth canon — 1.26 fleet-wide with `golang:1.26-alpine`
+  (the row still framed apparule as a lone 1.26 exception; caught by
+  the pass-3 sweep) (#134).
+
 - `SKILL.md` self-consistency pass (found by the standards self-audit):
   the pre-canon Flutter tree block now points at the feature-first mobile
   standard; mobile CI described as it ships (native riverpod_lint on
