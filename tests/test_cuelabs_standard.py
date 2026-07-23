@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import importlib.util
 import io
+import json
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import date, timedelta
 from pathlib import Path
 from unittest import mock
@@ -159,7 +160,28 @@ class StandardsCliTest(unittest.TestCase):
 
         self.assertEqual(audit.manifest, "valid")
         self.assertEqual(audit.manifest_errors, [])
+        self.assertEqual(audit.active_deviations[0]["id"], "EX-1")
         self.assertTrue(audit.conforming)
+
+        markdown = io.StringIO()
+        with redirect_stdout(markdown):
+            standard.emit_audit(
+                audit, "markdown", heading="CueLABS standards audit"
+            )
+        self.assertIn("## Active deviations", markdown.getvalue())
+        self.assertIn("`EX-1`: Intentional exception", markdown.getvalue())
+
+        json_output = io.StringIO()
+        with redirect_stdout(json_output):
+            standard.emit_plan(audit, "json")
+        payload = json.loads(json_output.getvalue())
+        self.assertEqual(payload["active_deviations"][0]["id"], "EX-1")
+        self.assertTrue(
+            any(
+                step["action"] == "Review active manifest deviations"
+                for step in payload["plan"]
+            )
+        )
 
     def test_apply_requires_manifest_before_modifying_active_product(self) -> None:
         (self.repo / "web").mkdir()
@@ -243,6 +265,16 @@ class StandardsCliTest(unittest.TestCase):
         audit = standard.inspect(self.repo)
 
         self.assertEqual(audit.surfaces["go-api"], "active")
+        self.assertTrue(audit.conforming)
+
+    def test_nested_web_status_activates_application_requirements(self) -> None:
+        self.write_manifest("  web:\n    storefront: active\n")
+        self.copy_required_templates(application=True)
+        (self.repo / ".github" / "dependabot.yml").write_text("version: 2\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.surfaces["web"], "active")
         self.assertTrue(audit.conforming)
 
     def test_cli_rejects_fake_git_metadata_before_apply(self) -> None:

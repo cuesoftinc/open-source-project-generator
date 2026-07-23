@@ -85,6 +85,7 @@ class Audit:
     profile: str
     manifest: str
     manifest_errors: list[str]
+    active_deviations: list[dict[str, Any]]
     surfaces: dict[str, str]
     missing_shared_files: list[str]
     drifted_shared_files: list[str]
@@ -387,14 +388,17 @@ def aggregate_status(value: Any) -> str:
 
 def declared_surfaces(data: dict[str, Any]) -> dict[str, str]:
     declared = data["surfaces"]
-    mobile = declared.get("mobile", {})
-    if not isinstance(mobile, dict):
-        mobile = {}
+    mobile = declared.get("mobile", declared.get("flutter", "absent"))
+    flutter = (
+        mobile.get("flutter", mobile)
+        if isinstance(mobile, dict)
+        else mobile
+    )
     backend = declared.get("backend", declared.get("api", "absent"))
     return {
-        "web": str(declared.get("web", "absent")),
+        "web": aggregate_status(declared.get("web", "absent")),
         "go-api": aggregate_status(backend),
-        "flutter": str(mobile.get("flutter", declared.get("flutter", "absent"))),
+        "flutter": aggregate_status(flutter),
         "helm": (
             "active"
             if data.get("deployment", {}).get("selfHost") == "helm"
@@ -452,6 +456,11 @@ def inspect(repo: Path) -> Audit:
     else:
         surfaces = inferred
 
+    active_deviations = (
+        [dict(item) for item in manifest.data.get("deviations", [])]
+        if manifest.state == "valid" and manifest.data is not None
+        else []
+    )
     targets = required_targets(manifest.profile, surfaces)
     missing_shared: list[str] = []
     drifted_shared: list[str] = []
@@ -486,6 +495,7 @@ def inspect(repo: Path) -> Audit:
         profile=manifest.profile,
         manifest=manifest.state,
         manifest_errors=manifest.errors,
+        active_deviations=active_deviations,
         surfaces=surfaces,
         missing_shared_files=sorted(missing_shared),
         drifted_shared_files=sorted(drifted_shared),
@@ -513,6 +523,16 @@ def build_plan(audit: Audit) -> list[PlanStep]:
             "manual",
             [".cuelabs/project.yaml"],
             "; ".join(audit.manifest_errors),
+        )
+    if audit.active_deviations:
+        deviation_ids = ", ".join(
+            str(deviation["id"]) for deviation in audit.active_deviations
+        )
+        add(
+            "Review active manifest deviations",
+            "manual",
+            [".cuelabs/project.yaml"],
+            f"Documented exceptions still require follow-up: {deviation_ids}.",
         )
     if audit.blocking_collisions:
         add(
@@ -562,6 +582,20 @@ def print_audit(audit: Audit, *, heading: str) -> None:
         print("- Manifest errors:")
         for error in audit.manifest_errors:
             print(f"  - {error}")
+    print()
+    print("## Active deviations")
+    print()
+    if audit.active_deviations:
+        for deviation in audit.active_deviations:
+            expiry = deviation.get("expires")
+            expiry_text = (
+                f"expires `{expiry}`" if expiry is not None else "no expiry"
+            )
+            print(
+                f"- `{deviation['id']}`: {deviation['reason']} ({expiry_text})"
+            )
+    else:
+        print("- None")
     print()
     print("## Detected surfaces")
     print()
