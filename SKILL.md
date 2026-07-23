@@ -1431,7 +1431,7 @@ Keep current; last reviewed with the values below.
 | Area | Version |
 |------|---------|
 | Next.js / React / TypeScript | 16.x / 19.2 / 5.9 |
-| Go | 1.25+ — builder image matches the module's `go` directive (`golang:1.25-alpine`; apparule is on 1.26) |
+| Go | 1.26 fleet-wide (single-truth canon) — builder image matches the module's `go` directive (`golang:1.26-alpine`) |
 | Gin | v1.12 |
 | Node | 24 (`node:24-slim` images) |
 | Android (Kotlin / Gradle / compileSdk) | 2.2 / 9.1 / 36 — for future native apps |
