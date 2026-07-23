@@ -52,7 +52,7 @@ service exists — do not add empty `api/image` placeholders.
 sourced from [`templates/`](templates/). Only `README.md`, `CHANGELOG.md`,
 and `.github/dependabot.yml` are repo-specific (repo overview, its own history,
 and its own manifest scoping); everything else in the table below — including the
-compose-driven `Makefile` — is identical across repos.
+compose-driven, mobile-ready `Makefile` — is identical across repos.
 
 | File | Purpose |
 |------|---------|
@@ -66,7 +66,7 @@ compose-driven `Makefile` — is identical across repos.
 | `.gitignore` | Must NOT ignore `.dockerignore`; must ignore `.env*`, secrets |
 | `.dockerignore` | Root byte-identical; plus one per build context (repo-specific, see `templates/dockerignore.*`) |
 | `.editorconfig` | Shared editor settings (tabs for Go) |
-| `Makefile` | Compose-driven standard targets (up/down/build/logs/…); identical across repos |
+| `Makefile` | Compose-driven standard targets plus guarded `mobile-goldens`; identical across repos |
 | `.env.example` | Root env template: per-service sections, dev-safe defaults, `NEXT_PUBLIC_*` block |
 | `.github/dependabot.yml` | **Scoped per manifest**, grouped per ecosystem |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
@@ -75,21 +75,25 @@ compose-driven `Makefile` — is identical across repos.
 **What's in `templates/`:** ready-to-copy `LICENSE`, `CODEOWNERS`,
 `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `PULL_REQUEST_TEMPLATE.md`,
 `ISSUE_TEMPLATE/*`, `Makefile`, a `dependabot.example.yml`, an `env.example`,
+`prettierignore.web`,
 Docker templates (`Dockerfile.go`, `Dockerfile.web`, `Dockerfile.python`,
 `docker-compose.example.yml`, per-context `dockerignore.*`), the standard-form
 Helm chart skeleton (`helm/`), and cluster-agnostic terraform (`terraform/`). Dotfile templates are stored
 **without** a leading dot so they stay visible and are never applied to this repo
 by accident — when adopting them, copy `templates/gitignore` → `.gitignore`,
 `templates/dockerignore.root` → `.dockerignore`, and `templates/editorconfig` →
-`.editorconfig`.
+`.editorconfig`; copy `templates/prettierignore.web` →
+`web/.prettierignore`.
 
 `dependabot.yml` is the one config that is **not** identical across repos: it
 lists one `updates` entry per real manifest directory (`gomod /api/common`,
 `pip /api/<python-service>`, `npm /web`, `pub /mobile/flutter`), grouped per
 ecosystem, and **must not** point at dead/deprecated directories. It has **no**
-`github-actions` entry — the CI workflows (`build-and-test.yml` +
-tag-gated `release.yml`) are org canon kept BYTE-IDENTICAL across repos
-and updated deliberately in canon passes, never by a per-repo bot.
+`github-actions` entry — CI workflow conventions and shared jobs are org canon
+kept byte-identical across repos and updated deliberately in canon passes,
+never by a per-repo bot. Product files may add only explicitly ratified
+surface jobs/workflows (for example Apparule mobile); the tag-gated
+`release.yml` remains a shared fleet file when it lands.
 
 ## Service structure (production)
 When bootstrapping or standardizing a service, **migrate existing code into
@@ -125,7 +129,8 @@ non-root image, pinned deps.
 **Next.js (`web`):**
 ```
 src/app/                      routes — home at `/`, product dashboard at `/dashboard`
-src/{components,lib,hooks,types,config,context}   src/proto/ (generated grpc-web, verbatim)
+src/{auth,components,config,controllers,design,generated,lib,mocks,models}
+src/proto/                    generated protocol clients, only when needed
 ```
 Minimal root `layout.tsx` (html/body — plus a CSS-in-JS registry only where the
 repo uses one); the home page
@@ -219,8 +224,11 @@ Gotchas that cost real time:
 
 ## Cleanup rules (when standardizing)
 Remove (safe — not application code):
-- **All GitHub Actions workflow files** (`.github/workflows/**`, or misplaced
-  workflow YAMLs directly under `.github/`). CI is not part of this standard.
+- **Non-canonical GitHub Actions workflow files**: preserve the ratified
+  `.github/workflows/build-and-test.yml`, the deferred tag-gated `release.yml`
+  when present, and ratified surface workflows such as Apparule's
+  `mobile-goldens.yml` and `mobile-e2e.yml`; remove obsolete, duplicate,
+  misplaced, or unratified workflow files.
 - Buggy/one-off scripts (e.g. old `refactor-structure.sh`).
 - Stale planning/aspirational docs that no longer match reality.
 - Generated artifacts committed by mistake (e.g. `output_landmarks.jpg`),
@@ -314,15 +322,18 @@ flowchart LR
   pending `release.yml` (lands with the deploy phase). GitHub Actions
   itself never deploys the sites.
 - **GitHub Actions standard (uniform across repos, ratified 2026-07-18)**:
-  two workflow families, identical names and shape in every repo —
+  standardized workflow families with identical shared jobs and conventions —
   `.github/workflows/build-and-test.yml` (workflow name `build-and-test`;
   triggers `push: branches [main]` + `pull_request`, no path filters —
-  surfaces join as jobs; `permissions: contents: read`; `concurrency:
+  build-ready surfaces join as jobs; `permissions: contents: read`; `concurrency:
   build-and-test-${{ github.ref }}` with cancel-in-progress; one job per
   surface: `web` = "web · lint + typecheck + unit + build" on Node 24
   (`npm ci → lint → typecheck → test → build`), `web-e2e` = "web ·
   Playwright (TEST_MODE)" (`playwright install --with-deps chromium →
-  test:e2e`), api/mobile jobs follow the same naming pattern; action steps
+  test:e2e`). API jobs land when a product backend reaches its build-ready
+  phase; mobile jobs land when mobile implementation begins. Once present,
+  stack-equivalent API/mobile jobs follow the same fleet naming, setup, cache,
+  and command shape; action steps
   pin the LATEST major of official actions — currently
   `actions/checkout@v7`, `actions/setup-node@v7`,
   `actions/upload-artifact@v7` (verify via
@@ -340,8 +351,9 @@ flowchart LR
   (retention 7) on failure) and the
   tag-gated `release.yml` (X-6; getpp/cueprise are the deploy-pattern
   references — NOT YET LANDED in any product repo; lands with the deploy
-  phase). Workflow files beyond these families are a standards
-  deviation and need ratification. CodeQL runs via GitHub DEFAULT SETUP
+  phase). Workflow files beyond these families and explicitly ratified
+  surface workflows are a standards deviation and need ratification. CodeQL
+  runs via GitHub DEFAULT SETUP
   (a repo setting, `gh api repos/<org>/<repo>/code-scanning/default-setup`),
   not a workflow file — parity audits check the API, not `.github/`.
 - **Test layout standard (uniform across repos, 2026-07-18)**: unit/
@@ -403,11 +415,15 @@ flowchart LR
   the env source of truth — project per repo, configs `dev / dev_personal /
   stg / prd`. Object storage: the sandbox project's default **Cloud Storage** bucket
   with per-product/env prefixes. Self-host compose bundles its own stores.
-- Protocols (X-8): **HTTP/JSON everywhere**; gRPC only where the domain
-  demands it (upstat: OTLP ingest + internal s2s; its browser gRPC-Web/Envoy
-  path is sunsetting at monitors-v2). Cloud Run requires end-to-end HTTP/2
-  (h2c) for gRPC services. Self-host Helm still deploys Envoy while the
-  gRPC-Web path exists.
+- Protocols (X-8): **HTTP/JSON is the default product API**; gRPC is a
+  standardized option wherever a domain needs streaming, telemetry ingest,
+  high-throughput internal s2s, or another documented transport requirement.
+  Generated protocol clients live in `src/proto/` (with transitional generated
+  client paths covered by the fleet `.prettierignore`). Upstat currently uses
+  gRPC for OTLP ingest + internal s2s; its browser gRPC-Web/Envoy path is
+  sunsetting at monitors-v2. Cloud Run requires end-to-end HTTP/2 (h2c) for
+  gRPC services. A product's self-host Helm chart deploys Envoy only while that
+  product exposes a gRPC-Web path.
 
 ## Documentation standard (docs/)
 
@@ -478,7 +494,8 @@ bridges). W3C `traceparent` propagates across all service boundaries.
 Export = **direct OTLP from the SDK** (BatchSpan/LogRecord processors);
 collector sidecar = later upgrade path, never a v1 requirement. **Receiver =
 upstat's OTLP gateway** (4317 gRPC / 4318 HTTP, ingest-key header; sibling
-exporters default to OTLP/HTTP — only upstat ever hosts gRPC, X-8) — CueLABS™
+exporters default to OTLP/HTTP — only upstat hosts the ecosystem OTLP
+receiver, X-8) — CueLABS™
 products dogfood upstat for their own observability. Export is env-gated:
 no OTEL_EXPORTER_OTLP_ENDPOINT → SDK no-ops (pre-OBS-001 posture). JSON
 stdout logging remains alongside (Cloud Run native). Operational telemetry
@@ -940,9 +957,12 @@ listed shared files are BYTE-IDENTICAL across repos — verify by shasum):
   fetchOnlyIn, viewBoundaries); per-repo active-rule lists live in a
   marked config section keyed by `package.json` name; every rule is
   negative-tested (fires on an injected violation).
-- **Prettier** — byte-identical `.prettierrc`/`.prettierignore`; one brace
-  glob `**/*.{ts,tsx,js,jsx,mjs,cjs}` (prettier hard-errors on
-  zero-match patterns — never enumerate separate globs).
+- **Prettier** — byte-identical `.prettierrc`/`.prettierignore`;
+  `.prettierignore` is sourced from `templates/prettierignore.web` and carries
+  the fleet superset of generated OpenAPI + protocol-client paths so products
+  never customize it when gRPC arrives; one brace glob
+  `**/*.{ts,tsx,js,jsx,mjs,cjs}` (prettier hard-errors on zero-match patterns —
+  never enumerate separate globs).
 - **Vitest** — canonical config: `@vitejs/plugin-react` +
   `vite-tsconfig-paths` + root `./vitest.setup.ts`, jsdom default.
   Repo-specific needs stay as COMMENTED, labeled blocks (apparule: no
