@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `SKILL.md` mobile standard: the E2E lane canon (patrol journeys, nightly
+  cadence, prove-then-revert for dispatch-only workflows) and the on-device
+  IME-injection gotcha (#131).
+
 - `SKILL.md` mobile standard: build-state hygiene at the gate — flutter
   clean, daemon stops, docker image prunes, and DerivedData purges are part
   of lane closeout (#130).
