@@ -320,6 +320,60 @@ class StandardsCliTest(unittest.TestCase):
         self.assertIsNone(audit.active_deviations[0]["expires"])
         self.assertTrue(audit.conforming)
 
+    def test_literal_and_folded_block_scalar_reasons_are_parsed(self) -> None:
+        manifest = self.repo / ".cuelabs" / "project.yaml"
+        manifest.parent.mkdir()
+        manifest.write_text(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces: { web: absent }\n"
+            "capabilities: {}\n"
+            "deployment: {}\n"
+            "deviations:\n"
+            "  - id: EX-1\n"
+            "    reason: |\n"
+            "      Preserve this line\n"
+            "      and this line.\n"
+            "    expires: null\n"
+            "  - id: EX-2\n"
+            "    reason: >-\n"
+            "      Fold this line\n"
+            "      into this line.\n"
+            "    expires: null\n"
+        )
+        self.copy_required_templates(application=False)
+
+        audit = standard.inspect(self.repo)
+
+        self.assertEqual(audit.manifest, "valid")
+        self.assertEqual(
+            audit.active_deviations[0]["reason"],
+            "Preserve this line\nand this line.\n",
+        )
+        self.assertEqual(
+            audit.active_deviations[1]["reason"],
+            "Fold this line into this line.",
+        )
+        self.assertTrue(audit.conforming)
+
+    def test_block_scalar_can_be_first_key_in_list_item(self) -> None:
+        data = standard.parse_yaml_subset(
+            "schemaVersion: 1\n"
+            "name: fixture\n"
+            "profile: cuelabs\n"
+            "surfaces: { web: absent }\n"
+            "deviations:\n"
+            "  - reason: |\n"
+            "      Multi-line reason.\n"
+            "    id: EX-1\n"
+            "    expires: null\n"
+        )
+
+        self.assertEqual(data["deviations"][0]["reason"], "Multi-line reason.\n")
+        self.assertEqual(data["deviations"][0]["id"], "EX-1")
+        self.assertIsNone(data["deviations"][0]["expires"])
+
     def test_nested_backend_status_activates_application_requirements(self) -> None:
         self.write_manifest("  backend:\n    go: active\n")
         self.copy_required_templates(application=True)

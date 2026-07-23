@@ -220,6 +220,105 @@ def parse_scalar(value: str) -> Any:
     return value
 
 
+BLOCK_SCALAR = re.compile(
+    r"^(?P<indent> *)(?P<prefix>(?:-\s+)?[A-Za-z][A-Za-z0-9_-]*:\s*)"
+    r"(?P<style>[|>])(?P<modifiers>(?:[1-9][+-]?|[+-][1-9]?|))"
+    r"(?:\s+#.*)?$"
+)
+
+
+def fold_block_lines(lines: list[str]) -> str:
+    folded = ""
+    for index, line in enumerate(lines):
+        folded += line
+        if index == len(lines) - 1:
+            continue
+        following = lines[index + 1]
+        if not line:
+            if not following:
+                folded += "\n"
+        elif not following or line[:1].isspace() or following[:1].isspace():
+            folded += "\n"
+        else:
+            folded += " "
+    return folded
+
+
+def expand_block_scalars(text: str) -> str:
+    lines = text.splitlines()
+    expanded = list(lines)
+    index = 0
+    while index < len(lines):
+        match = BLOCK_SCALAR.fullmatch(lines[index])
+        if match is None:
+            index += 1
+            continue
+
+        header_indent = len(match["indent"])
+        modifiers = match["modifiers"]
+        explicit_indent = next(
+            (int(character) for character in modifiers if character.isdigit()),
+            None,
+        )
+        content_indent = (
+            header_indent + explicit_indent
+            if explicit_indent is not None
+            else None
+        )
+        content_start = index + 1
+        content_end = content_start
+        while content_end < len(lines):
+            candidate = lines[content_end]
+            if not candidate.strip():
+                content_end += 1
+                continue
+            candidate_indent = len(candidate) - len(candidate.lstrip(" "))
+            if candidate_indent <= header_indent:
+                break
+            if content_indent is None:
+                content_indent = candidate_indent
+            elif candidate_indent < content_indent:
+                break
+            content_end += 1
+
+        raw_content = lines[content_start:content_end]
+        content_indent = content_indent or header_indent + 1
+        if any(
+            line.strip()
+            and len(line) - len(line.lstrip(" ")) < content_indent
+            for line in raw_content
+        ):
+            raise ManifestError(
+                f"line {index + 1}: block scalar content is under-indented"
+            )
+
+        content = [
+            line[content_indent:] if line.strip() else ""
+            for line in raw_content
+        ]
+        value = (
+            "\n".join(content)
+            if match["style"] == "|"
+            else fold_block_lines(content)
+        )
+        if content:
+            if "-" in modifiers:
+                value = value.rstrip("\n")
+            elif "+" not in modifiers:
+                value = value.rstrip("\n") + "\n"
+            else:
+                value += "\n"
+
+        expanded[index] = (
+            f"{match['indent']}{match['prefix']}"
+            f"{json.dumps(value, ensure_ascii=False)}"
+        )
+        for content_index in range(content_start, content_end):
+            expanded[content_index] = ""
+        index = content_end
+    return "\n".join(expanded)
+
+
 def yaml_tokens(text: str) -> list[tuple[int, str, int]]:
     tokens: list[tuple[int, str, int]] = []
     for line_number, raw in enumerate(text.splitlines(), 1):
@@ -326,7 +425,7 @@ def parse_yaml_block(
 
 
 def parse_yaml_subset(text: str) -> dict[str, Any]:
-    tokens = yaml_tokens(text)
+    tokens = yaml_tokens(expand_block_scalars(text))
     if not tokens:
         raise ManifestError("manifest is empty")
     if tokens[0][0] != 0:
