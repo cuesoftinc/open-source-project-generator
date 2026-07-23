@@ -43,6 +43,11 @@ CUELABS_APPLICATION_TEMPLATE_TARGETS = {
     "env.example": ".env.example",
 }
 
+# Seeded targets are copied when missing but never byte-compared afterwards:
+# the canon fixes their variable NAMES and section format, while values and
+# product-specific sections legitimately diverge per repository.
+SEEDED_TEMPLATE_SOURCES = {"env.example"}
+
 PORTABLE_REPOSITORY_FILES = [
     "CODEOWNERS",
     "CODE_OF_CONDUCT.md",
@@ -805,7 +810,10 @@ def inspect(repo: Path) -> Audit:
         source = TEMPLATE_ROOT / source_name
         if not source.is_file():
             collisions.append(f"{destination_name} (bundled template missing)")
-        elif destination.read_bytes() != source.read_bytes():
+        elif (
+            source_name not in SEEDED_TEMPLATE_SOURCES
+            and destination.read_bytes() != source.read_bytes()
+        ):
             drifted_shared.append(destination_name)
 
     repository_specific = ["README.md", "CHANGELOG.md"]

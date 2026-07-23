@@ -91,6 +91,29 @@ class StandardsCliTest(unittest.TestCase):
         self.assertIn("LICENSE", audit.drifted_shared_files)
         self.assertFalse(audit.conforming)
 
+    def test_customized_env_example_is_seeded_not_drift(self) -> None:
+        self.write_manifest("  web: active\n")
+        self.copy_required_templates(application=True)
+        (self.repo / ".env.example").write_text(
+            "# product local development environment.\nJWT_SECRET=dev-only\n"
+        )
+        (self.repo / ".github").mkdir(exist_ok=True)
+        (self.repo / ".github" / "dependabot.yml").write_text("version: 2\n")
+
+        audit = standard.inspect(self.repo)
+
+        self.assertNotIn(".env.example", audit.drifted_shared_files)
+        self.assertTrue(audit.conforming)
+
+    def test_missing_env_example_is_still_seeded_on_apply(self) -> None:
+        self.write_manifest("  web: active\n")
+        self.copy_required_templates(application=True)
+        (self.repo / ".env.example").unlink()
+
+        audit = standard.inspect(self.repo)
+
+        self.assertIn(".env.example", audit.missing_shared_files)
+
     def test_invalid_manifest_is_rejected(self) -> None:
         manifest = self.repo / ".cuelabs" / "project.yaml"
         manifest.parent.mkdir()
