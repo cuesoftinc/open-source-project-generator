@@ -88,6 +88,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `SKILL.md`: deploy truth reconciled by surface — websites ride Firebase
+  App Hosting automatic rollouts from `main` (cuesoft-iac appHosting;
+  live in ~30 min, verified), while API-service deploys stay tag-gated
+  via the pending `release.yml`; the changelog discipline gains the
+  append-into-existing-bucket rule (second headings forced dedup rounds
+  in every repo) (#135).
+
 - `SKILL.md`: the Recommended-versions Go row reconciled to the Go
   single-truth canon — 1.26 fleet-wide with `golang:1.26-alpine`
   (the row still framed apparule as a lone 1.26 exception; caught by
