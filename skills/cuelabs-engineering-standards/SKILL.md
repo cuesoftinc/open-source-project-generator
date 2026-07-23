@@ -60,10 +60,11 @@ unless the task actually touches that surface.
 2. Read `.cuelabs/project.yaml` when present. If absent, infer current surfaces
    from evidence and label the inference; do not treat a roadmap as built code.
 3. Classify each surface as `active`, `planned`, `paused`, or `absent`.
-4. Run:
+4. Resolve this installed skill's directory from the active skill metadata or
+   path, then run its bundled script by absolute path:
 
    ```bash
-   python3 scripts/cuelabs_standard.py audit --repo <path>
+   python3 <skill-dir>/scripts/cuelabs_standard.py audit --repo <target-repo>
    ```
 
    Use `--format json` when another tool will consume the result.
@@ -76,7 +77,7 @@ unless the task actually touches that surface.
 6. For apply work, show or inspect the plan first:
 
    ```bash
-   python3 scripts/cuelabs_standard.py plan --repo <path>
+   python3 <skill-dir>/scripts/cuelabs_standard.py plan --repo <target-repo>
    ```
 
 7. Preserve application code and git history. Use `git mv` for structural
@@ -87,7 +88,7 @@ unless the task actually touches that surface.
 9. Run repository-native tests plus:
 
    ```bash
-   python3 scripts/cuelabs_standard.py verify --repo <path>
+   python3 <skill-dir>/scripts/cuelabs_standard.py verify --repo <target-repo>
    ```
 
 10. Report changed files, checks, remaining deviations, and any decisions that

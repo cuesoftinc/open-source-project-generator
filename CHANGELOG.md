@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   validation CI; and a dependency-free `audit / plan / apply / verify` tool.
 - Public adoption, compatibility, governance, and v2 migration documentation
   with one-command Codex and Cursor installation.
+- Baseline CLI regression coverage for installed resource resolution, manifest
+  authority and validation, shared-file drift, ordered plans, path collisions,
+  and idempotent application.
 
 - `SKILL.md`: fleet parity canons from the 2026-07-23 cross-repo review —
   Node 24 single-truth (CI + .nvmrc + image + README), Go single-truth

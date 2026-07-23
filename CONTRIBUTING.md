@@ -45,6 +45,7 @@ Run:
 
 ```bash
 python3 scripts/validate_catalog.py
+python3 -m unittest discover -s tests -v
 gh skill publish --dry-run
 ```
 

@@ -24,6 +24,9 @@ jobs:
       - name: Validate catalog
         run: python3 scripts/validate_catalog.py
 
+      - name: Test baseline CLI
+        run: python3 -m unittest discover -s tests -v
+
       - name: Exercise CLI
         run: |
           python3 skills/cuelabs-engineering-standards/scripts/cuelabs_standard.py audit --repo .

@@ -137,6 +137,12 @@ The first command is dependency-free and validates local structure, links,
 metadata, line limits, and evaluation coverage. The second runs GitHub's
 official Agent Skills and repository checks without publishing.
 
+Run the baseline CLI regression suite with:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and
